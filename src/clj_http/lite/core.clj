@@ -47,7 +47,8 @@
    the clj-http uses ByteArrays for the bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body socket-timeout
-           conn-timeout multipart debug insecure? save-request? follow-redirects] :as req}]
+           conn-timeout multipart debug insecure? save-request? follow-redirects
+           chunk-size] :as req}]
   (let [http-url (str (name scheme) "://" server-name
                       (when server-port (str ":" server-port))
                       uri
@@ -70,6 +71,8 @@
       (.setReadTimeout conn socket-timeout))
     (when conn-timeout
       (.setConnectTimeout conn conn-timeout))
+    (when chunk-size
+      (.setChunkedStreamingMode conn chunk-size))
     (.connect conn)
     (when body
       (with-open [out (.getOutputStream conn)]
