@@ -1,9 +1,10 @@
 # `clj-http-lite`
 
-A Clojure HTTP library similar to
-[clj-http](http://github.com/dakrone/clj-http), but more lightweight.
+A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight.
 
 > This is a somewhat maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
+
+[Installation](#installation) | [Usage](#usage) | [Known Issues](#known-issues) | [Design](#design) | [Development](#development)
 
 ## Installation
 
@@ -191,6 +192,15 @@ scheme used (normally 'http' or 'https').
 If you need to fake clj-http responses (for things like testing and
 such), check out the
 [clj-http-fake](https://github.com/myfreeweb/clj-http-fake) library.
+
+## Known Issues
+
+- Nested form params [aren't serialized correctly](https://github.com/hiredman/clj-http-lite/issues/15). There's an easy workaround however:
+
+    ```clojure
+    :form-params {"toplevel" {"nested" some-data}} ; doesn't work
+    :form-params {"toplevel[nested]" some-data}    ; works
+    ```
 
 ## Design
 
