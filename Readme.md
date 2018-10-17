@@ -3,10 +3,11 @@
 A Clojure HTTP library similar to
 [clj-http](http://github.com/dakrone/clj-http), but more lightweight.
 
+> This is a somewhat maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
+
 ## Installation
 
-`clj-http-lite` is available as a Maven artifact
-from [Clojars](http://clojars.org/clj-http-lite):
+`clj-http-lite` is available as a Maven artifact from [Clojars](http://clojars.org/clj-http-lite):
 
 ```clojure
 [clj-http-lite "0.3.0"]
