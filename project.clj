@@ -2,6 +2,8 @@
   :description "A Clojure HTTP library similar to clj-http, but more lightweight."
   :url "https://github.com/martinklepsch/clj-http-lite/"
   :warn-on-reflection false
+  :license {:name "MIT"
+            :url "http://www.opensource.org/licenses/mit-license.php"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [slingshot "0.12.1"]]
   :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.3.2"]
