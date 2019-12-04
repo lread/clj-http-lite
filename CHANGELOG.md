@@ -1,4 +1,4 @@
-### Unreleased
+### 0.4.3
 
 - **Feature:** Parse link headers from response and put them under `:links` ([#1](https://github.com/martinklepsch/clj-http-lite/pull/1))
 

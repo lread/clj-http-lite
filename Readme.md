@@ -1,6 +1,6 @@
 # `clj-http-lite` [![cljdoc badge](https://cljdoc.xyz/badge/org.martinklepsch/clj-http-lite)](https://cljdoc.xyz/d/org.martinklepsch/clj-http-lite/CURRENT) [![CircleCI](https://circleci.com/gh/martinklepsch/clj-http-lite.svg?style=svg)](https://circleci.com/gh/martinklepsch/clj-http-lite)
 
-A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight.
+A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with GraalVM.
 
 > This is a somewhat maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
 
@@ -11,7 +11,7 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 `clj-http-lite` is available as a Maven artifact from [Clojars](http://clojars.org/clj-http-lite):
 
 ```clojure
-[org.martinklepsch/clj-http-lite "0.4.2"]
+[org.martinklepsch/clj-http-lite "0.4.3"]
 ```
 
 ## Differences from clj-http
