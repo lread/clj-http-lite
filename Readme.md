@@ -11,7 +11,7 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 `clj-http-lite` is available as a Maven artifact from [Clojars](http://clojars.org/clj-http-lite):
 
 ```clojure
-[org.martinklepsch/clj-http-lite "0.4.1"]
+[org.martinklepsch/clj-http-lite "0.4.2"]
 ```
 
 ## Differences from clj-http
