@@ -2,7 +2,9 @@
   "Core HTTP request/response implementation."
   (:require [clojure.java.io :as io])
   (:import (java.io ByteArrayOutputStream InputStream IOException)
-           (java.net URI URL HttpURLConnection)))
+           (java.net URI URL HttpURLConnection)
+           (javax.net.ssl SSLContext X509TrustManager TrustManager HttpsURLConnection HostnameVerifier SSLSession)
+           (java.security SecureRandom)))
 
 (set! *warn-on-reflection* true)
 
@@ -41,6 +43,19 @@
         (.flush baos)
         (.toByteArray baos)))))
 
+(defn my-host-verifier []
+  (proxy [HostnameVerifier] []
+    (verify [^String hostname ^SSLSession session] true)))
+
+(defn trust-invalid-manager []
+  "This allows the ssl socket to connect with invalid/self-signed SSL certs."
+  (reify X509TrustManager
+    (getAcceptedIssuers [this] nil)
+    (checkClientTrusted [this certs authType])
+    (checkServerTrusted [this certs authType])
+    )
+  )
+
 (defn request
   "Executes the HTTP request corresponding to the given Ring request map and
    returns the Ring response map corresponding to the resulting HTTP response.
@@ -55,7 +70,11 @@
                       (when server-port (str ":" server-port))
                       uri
                       (when query-string (str "?" query-string)))
-        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))]
+        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))
+        ssl-context (doto (SSLContext/getInstance "SSL")
+                      (.init nil (into-array TrustManager [(trust-invalid-manager)]) (new SecureRandom)))]
+    (when insecure? (HttpsURLConnection/setDefaultSSLSocketFactory (.getSocketFactory ssl-context))
+                    (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
                                                     "; charset="
