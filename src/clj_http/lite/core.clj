@@ -70,11 +70,14 @@
                       (when server-port (str ":" server-port))
                       uri
                       (when query-string (str "?" query-string)))
-        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))
-        ssl-context (doto (SSLContext/getInstance "SSL")
-                      (.init nil (into-array TrustManager [(trust-invalid-manager)]) (new SecureRandom)))]
-    (when insecure? (HttpsURLConnection/setDefaultSSLSocketFactory (.getSocketFactory ssl-context))
-                    (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))
+        _ (when insecure?
+            (do (HttpsURLConnection/setDefaultSSLSocketFactory
+                  (.getSocketFactory
+                    (doto (SSLContext/getInstance "TLS")
+                      (.init nil (into-array TrustManager [(trust-invalid-manager)])
+                             (new SecureRandom)))))
+                (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier))))
+        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))]
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
                                                     "; charset="
@@ -99,9 +102,9 @@
       (with-open [out (.getOutputStream conn)]
         (io/copy body out)))
     (merge {:headers (parse-headers conn)
-            :status (.getResponseCode conn)
-            :body (when-not (= request-method :head)
-                    (coerce-body-entity req conn))}
+            :status  (.getResponseCode conn)
+            :body    (when-not (= request-method :head)
+                       (coerce-body-entity req conn))}
            (when save-request?
              {:request (assoc (dissoc req :save-request?)
                          :http-url http-url)}))))
