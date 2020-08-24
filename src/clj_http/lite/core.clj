@@ -52,9 +52,7 @@
   (reify X509TrustManager
     (getAcceptedIssuers [this] nil)
     (checkClientTrusted [this certs authType])
-    (checkServerTrusted [this certs authType])
-    )
-  )
+    (checkServerTrusted [this certs authType])))
 
 (defn request
   "Executes the HTTP request corresponding to the given Ring request map and
