@@ -22,7 +22,6 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 - No proxy-ing DELETEs with body
 - No multipart form uploads
 - No persistent connection support
-- No support for insecure HTTPS connection (yet)
 - namespace rename clj-http.* -> clj-http.lite.*
 
 ## Usage

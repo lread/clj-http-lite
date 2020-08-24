@@ -2,8 +2,8 @@
   "Core HTTP request/response implementation."
   (:require [clojure.java.io :as io])
   (:import (java.io ByteArrayOutputStream InputStream IOException)
-           (java.net URI URL HttpURLConnection)
-           (javax.net.ssl SSLContext X509TrustManager TrustManager HttpsURLConnection HostnameVerifier SSLSession)
+           (java.net URL HttpURLConnection)
+           (javax.net.ssl HttpsURLConnection SSLContext TrustManager X509TrustManager HostnameVerifier SSLSession)
            (java.security SecureRandom)))
 
 (set! *warn-on-reflection* true)
@@ -52,9 +52,7 @@
   (reify X509TrustManager
     (getAcceptedIssuers [this] nil)
     (checkClientTrusted [this certs authType])
-    (checkServerTrusted [this certs authType])
-    )
-  )
+    (checkServerTrusted [this certs authType])))
 
 (defn request
   "Executes the HTTP request corresponding to the given Ring request map and
@@ -73,7 +71,7 @@
         _ (when insecure?
             (do (HttpsURLConnection/setDefaultSSLSocketFactory
                   (.getSocketFactory
-                    (doto (SSLContext/getInstance "TLS")
+                    (doto (SSLContext/getInstance "SSL")
                       (.init nil (into-array TrustManager [(trust-invalid-manager)])
                              (new SecureRandom)))))
                 (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier))))
