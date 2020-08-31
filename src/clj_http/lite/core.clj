@@ -100,9 +100,9 @@
       (with-open [out (.getOutputStream conn)]
         (io/copy body out)))
     (merge {:headers (parse-headers conn)
-            :status  (.getResponseCode conn)
-            :body    (when-not (= request-method :head)
-                       (coerce-body-entity req conn))}
+            :status (.getResponseCode conn)
+            :body (when-not (= request-method :head)
+                    (coerce-body-entity req conn))}
            (when save-request?
              {:request (assoc (dissoc req :save-request?)
                          :http-url http-url)}))))
