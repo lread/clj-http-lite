@@ -9,11 +9,12 @@
       (uncaughtException [_ thread e]
         ;; Omit exceptions coming from "Address already in use" because they're meaningless
         ;; (these happen when one picks port 0, and after one such exception a new port will be retried successfully)
-        (let [omit? (and (instance? MultiException e)
-                         (->> ^MultiException e
-                              .getThrowables
-                              (every? (fn [^Throwable t]
-                                        (-> t .getMessage (string/includes? "Address already in use"))))))]
+        (let [omit? (or (-> ^Throwable e .getMessage #{"Address already in use"})
+                        (and (instance? MultiException e)
+                             (->> ^MultiException e
+                                  .getThrowables
+                                  (every? (fn [^Throwable t]
+                                            (-> t .getMessage (string/includes? "Address already in use")))))))]
           (when-not omit?
             (-> ^Throwable e .printStackTrace)
             (when (System/getenv "CI")

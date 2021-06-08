@@ -7,7 +7,8 @@
             [ring.adapter.jetty :as ring])
   (:import (java.io ByteArrayInputStream)
            (org.eclipse.jetty.server Server)
-           (org.eclipse.jetty.server.nio SelectChannelConnector)))
+           (org.eclipse.jetty.server.nio SelectChannelConnector)
+           (org.eclipse.jetty.server.ssl SslSelectChannelConnector)))
 
 (defn handler [req]
   (condp = [(:request-method req) (:uri req)]
@@ -34,14 +35,30 @@
     {:status 200 :body (:body req)}))
 
 (defn make-server ^Server []
-  (ring/run-jetty handler {:port  0 ;; Use a free port
-                           :join? false}))
+  (ring/run-jetty handler {:port         0 ;; Use a free port
+                           :join?        false
+                           :ssl-port     0 ;; Use a free port
+                           :ssl?         true
+                           :keystore     "test-resources/keystore"
+                           :key-password "keykey"}))
 
 (def ^:dynamic *server* nil)
 
 (defn current-port []
   (let [^Server s *server*]
-    (-> s .getConnectors ^SelectChannelConnector (first) .getLocalPort)))
+    (->> s
+         .getConnectors
+         (filter (comp #{SelectChannelConnector} class))
+         ^SelectChannelConnector (first)
+         .getLocalPort)))
+
+(defn current-https-port []
+  (let [^Server s *server*]
+    (->> s
+         .getConnectors
+         (filter (comp #{SslSelectChannelConnector} class))
+         ^SslSelectChannelConnector (first)
+         .getLocalPort)))
 
 (defn with-server [t]
   (let [s (make-server)]
@@ -138,21 +155,16 @@
 ;;     (is (= 200 (:status resp)))))
 
 (deftest ^{:integration true} self-signed-ssl-get
-  (let [t (doto (Thread. #(ring/run-jetty handler
-                                          {:ssl?         true
-                                           :keystore     "test-resources/keystore"
-                                           :key-password "keykey"})) .start)]
-    (Thread/sleep 1000)
-    (try
-      (is (thrown? javax.net.ssl.SSLException
-                   (request {:request-method :get :uri "/get"
-                             :scheme         :https})))
-      #_(let [resp (request {:request-method :get   :uri       "/get" :server-port 18082
-                             :scheme         :https :insecure? true})]
-          (is (= 200 (:status resp)))
-          (is (= "get" (slurp-body resp))))
-      (finally
-        (.stop t)))))
+  (let [client-opts {:request-method :get
+                     :uri "/get"
+                     :scheme         :https
+                     :server-name (str "localhost:" (current-https-port))
+                     :port        (current-https-port)}]
+    (is (thrown? javax.net.ssl.SSLException
+                 (request client-opts)))
+    (let [resp (request (assoc client-opts :insecure? true))]
+      (is (= 200 (:status resp)))
+      (is (= "get" (slurp-body resp))))))
 
 ;; (deftest ^{:integration true} multipart-form-uploads
 ;;   (run-server)
