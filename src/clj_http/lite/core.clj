@@ -63,7 +63,7 @@
    the clj-http uses ByteArrays for the bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body socket-timeout
-           conn-timeout multipart debug insecure? save-request? follow-redirects
+           conn-timeout debug insecure? save-request? follow-redirects
            chunk-size] :as req}]
   (let [http-url (str (name scheme) "://" server-name
                       (when server-port (str ":" server-port))

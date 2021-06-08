@@ -30,9 +30,7 @@
       (Thread/sleep 10)
       {:status 200 :body "timeout"})
     [:delete "/delete-with-body"]
-    {:status 200 :body "delete-with-body"}
-    [:post "/multipart"]
-    {:status 200 :body (:body req)}))
+    {:status 200 :body "delete-with-body"}))
 
 (defn make-server ^Server []
   (ring/run-jetty handler {:port         0 ;; Use a free port
@@ -165,23 +163,6 @@
     (let [resp (request (assoc client-opts :insecure? true))]
       (is (= 200 (:status resp)))
       (is (= "get" (slurp-body resp))))))
-
-;; (deftest ^{:integration true} multipart-form-uploads
-;;   (run-server)
-;;   (let [bytes (util/utf8-bytes "byte-test")
-;;         stream (ByteArrayInputStream. bytes)
-;;         resp (request {:request-method :post :uri "/multipart"
-;;                        :multipart [["a" "testFINDMEtest"]
-;;                                    ["b" bytes]
-;;                                    ["c" stream]
-;;                                    ["d" (file "test-resources/keystore")]]})
-;;         resp-body (apply str (map #(try (char %) (catch Exception _ ""))
-;;                                   (:body resp)))]
-;;     (is (= 200 (:status resp)))
-;;     (is (re-find #"testFINDMEtest" resp-body))
-;;     (is (re-find #"byte-test" resp-body))
-;;     (is (re-find #"name=\"c\"" resp-body))
-;;     (is (re-find #"name=\"d\"" resp-body))))
 
 (deftest ^{:integration true} t-save-request-obj
   (let [resp (request {:request-method :post :uri "/post"
