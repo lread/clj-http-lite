@@ -5,7 +5,7 @@
             :url "http://www.opensource.org/licenses/mit-license.php"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [slingshot "0.12.2"]]
-  :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.3.2"]]}
+  :profiles {:test {:dependencies [[ring/ring-jetty-adapter "1.3.2"]]}
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.0"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
