@@ -1,26 +1,22 @@
 (ns clj-http.test.client
-  (:use [clojure.test]
-        [clj-http.test.core :only [run-server]])
   (:require [clj-http.lite.client :as client]
-            [clj-http.lite.util :as util])
+            [clj-http.test.core :refer [base-req current-port with-server]]
+            [clj-http.lite.util :as util]
+            [clojure.test :refer [deftest is testing use-fixtures]])
   (:import (java.net UnknownHostException)
            (java.util Arrays)))
 
-(def base-req
-  {:scheme :http
-   :server-name "localhost"
-   :server-port 18080})
+(use-fixtures :each with-server)
 
 (deftest ^{:integration true} roundtrip
-  (run-server)
-  (Thread/sleep 1000)
   ;; roundtrip with scheme as a keyword
-  (let [resp (client/request (merge base-req {:uri "/get" :method :get}))]
+  (let [resp (client/request (merge (base-req) {:uri "/get" :method :get}))]
     (is (= 200 (:status resp)))
     #_(is (= "close" (get-in resp [:headers "connection"])))
     (is (= "get" (:body resp))))
   ;; roundtrip with scheme as a string
-  (let [resp (client/request (merge base-req {:uri "/get" :method :get
+  (let [resp (client/request (merge (base-req) {:uri    "/get"
+                                                :method :get
                                               :scheme "http"}))]
     (is (= 200 (:status resp)))
     #_(is (= "close" (get-in resp [:headers "connection"])))
