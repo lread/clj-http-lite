@@ -12,14 +12,12 @@
   ;; roundtrip with scheme as a keyword
   (let [resp (client/request (merge (base-req) {:uri "/get" :method :get}))]
     (is (= 200 (:status resp)))
-    #_(is (= "close" (get-in resp [:headers "connection"])))
     (is (= "get" (:body resp))))
   ;; roundtrip with scheme as a string
   (let [resp (client/request (merge (base-req) {:uri    "/get"
                                                 :method :get
                                               :scheme "http"}))]
     (is (= 200 (:status resp)))
-    #_(is (= "close" (get-in resp [:headers "connection"])))
     (is (= "get" (:body resp)))))
 
 (defn is-passed [middleware req]
