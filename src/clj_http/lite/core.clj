@@ -47,8 +47,9 @@
   (proxy [HostnameVerifier] []
     (verify [^String hostname ^SSLSession session] true)))
 
-(defn trust-invalid-manager []
+(defn trust-invalid-manager
   "This allows the ssl socket to connect with invalid/self-signed SSL certs."
+  []
   (reify X509TrustManager
     (getAcceptedIssuers [this] nil)
     (checkClientTrusted [this certs authType])
@@ -69,13 +70,13 @@
                       uri
                       (when query-string (str "?" query-string)))
         _ (when insecure?
-            (do (HttpsURLConnection/setDefaultSSLSocketFactory
+            (HttpsURLConnection/setDefaultSSLSocketFactory
                   (.getSocketFactory
                     (doto (SSLContext/getInstance "SSL")
                       (.init nil (into-array TrustManager [(trust-invalid-manager)])
                              (new SecureRandom)))))
-                (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier))))
-        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))]
+            (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))
+        ^HttpURLConnection conn (.openConnection (URL. http-url))]
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
                                                     "; charset="
