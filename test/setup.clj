@@ -14,7 +14,7 @@
                              (->> ^MultiException e
                                   .getThrowables
                                   (every? (fn [^Throwable t]
-                                            (-> t .getMessage (string/includes? "Address already in use")))))))]
+                                            (-> t .getMessage (.contains "Address already in use")))))))]
           (when-not omit?
             (-> ^Throwable e .printStackTrace)
             (when (System/getenv "CI")

@@ -80,7 +80,6 @@
   (slurp (:body req)))
 
 (deftest ^{:integration true} makes-get-request
-  (current-port)
   (let [resp (request {:request-method :get :uri "/get"})]
     (is (= 200 (:status resp)))
     (is (= "get" (slurp-body resp)))))
