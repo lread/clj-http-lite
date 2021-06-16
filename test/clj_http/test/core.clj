@@ -32,7 +32,7 @@
     [:delete "/delete-with-body"]
     {:status 200 :body "delete-with-body"}))
 
-(defn make-server ^Server []
+(defn make-server ^org.eclipse.jetty.server.Server []
   (ring/run-jetty handler {:port         0 ;; Use a free port
                            :join?        false
                            :ssl-port     0 ;; Use a free port
@@ -43,11 +43,11 @@
 (def ^:dynamic *server* nil)
 
 (defn current-port []
-  (let [^Server s *server*]
+  (let [^org.eclipse.jetty.server.Server s *server*]
     (->> s
          .getConnectors
          (filter (comp #{SelectChannelConnector} class))
-         ^SelectChannelConnector (first)
+         ^org.eclipse.jetty.server.nio.SelectChannelConnector (first)
          .getLocalPort)))
 
 (defn current-https-port []
@@ -55,7 +55,7 @@
     (->> s
          .getConnectors
          (filter (comp #{SslSelectChannelConnector} class))
-         ^SslSelectChannelConnector (first)
+         ^org.eclipse.jetty.server.nio.SslSelectChannelConnector (first)
          .getLocalPort)))
 
 (defn with-server [t]
@@ -153,10 +153,10 @@
 
 (deftest ^{:integration true} self-signed-ssl-get
   (let [client-opts {:request-method :get
-                     :uri "/get"
+                     :uri            "/get"
                      :scheme         :https
-                     :server-name (str "localhost:" (current-https-port))
-                     :port        (current-https-port)}]
+                     :server-name    (str "localhost:" (current-https-port))
+                     :port           (current-https-port)}]
     (is (thrown? javax.net.ssl.SSLException
                  (request client-opts)))
     (let [resp (request (assoc client-opts :insecure? true))]

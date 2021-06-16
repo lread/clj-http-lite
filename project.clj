@@ -16,6 +16,7 @@
              :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}
              :1.10 {:dependencies [[org.clojure/clojure "1.10.3"]]}}
+  :plugins [[jonase/eastwood "0.9.9"]]
   :test-selectors {:default     (constantly true)
                    :all         (constantly true)
                    :unit        #(not (:integration %))

@@ -22,3 +22,5 @@ jobs:
         uses: actions/checkout@v2-beta
       - name: Run tests
         run: lein with-profile -user,-dev,+test,+${{ matrix.clojure-version }} do clean, test
+      - name: Lint
+        run: lein with-profile -user,-dev,+test,+${{ matrix.clojure-version }} eastwood
