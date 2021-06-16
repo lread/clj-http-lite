@@ -1,6 +1,6 @@
 # `clj-http-lite` [![cljdoc badge](https://cljdoc.xyz/badge/org.martinklepsch/clj-http-lite)](https://cljdoc.xyz/d/org.martinklepsch/clj-http-lite/CURRENT) [![CI](https://github.com/martinklepsch/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/martinklepsch/clj-http-lite/actions)
 
-A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with GraalVM.
+A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight (and dependency-free by default). Compatible with GraalVM.
 
 > This is a somewhat maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
 
@@ -27,10 +27,10 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 ## Usage
 
 The main HTTP client functionality is provided by the
-`clj-http.lite.client` namespace:
+`clj-http-lite.client` namespace:
 
 ```clojure
-(require '[clj-http.lite.client :as client])
+(require '[clj-http-lite.client :as client])
 ```
 
 The client supports simple `get`, `head`, `put`, `post`, and `delete`
@@ -143,25 +143,19 @@ as a primitive for building higher-level interfaces:
 
 ### Exceptions
 
+> NOTE: The newer `clj-http-lite.client` ns does not use Slingshot.
+> The legacy `clj-http.lite.client` remains available, as long as your project explicitly adds a Slingshot dependency.
+
 The client will throw exceptions on, well, exceptional status
-codes. clj-http will throw a
-[Slingshot](http://github.com/scgilardi/slingshot) Stone that can be
-caught by a regular `(catch Exception e ...)` or in Slingshot's `try+`
-block:
+codes. clj-http will `throw` a vanilla `ex-info`.
 
 ```clojure
 (client/get "http://site.com/broken")
-=> Stone Object thrown by throw+: {:status 404, :headers {"server" "nginx/1.0.4",
-                                                          "x-runtime" "12ms",
-                                                          "content-encoding" "gzip",
-                                                          "content-type" "text/html; charset=utf-8",
-                                                          "date" "Mon, 17 Oct 2011 23:15 :36 GMT",
-                                                          "cache-control" "no-cache",
-                                                          "status" "404 Not Found",
-                                                          "transfer-encoding" "chunked",
-                                                          "connection" "close"},
-                                   :body "...body here..."}
-   clj-http.lite.client/wrap-exceptions/fn--227 (client.clj:37)
+#error {
+ :cause "clj-http: status 404"
+ :data {:response {:headers {"content-type" "text/html; charset=UTF-8", "content-length" "1569"},
+                   :status 404,
+                   :body "..."}}}
 
 ;; You can also ignore exceptions and handle them yourself:
 (client/get "http://site.com/broken" {:throw-exceptions false})
@@ -210,10 +204,10 @@ server applications.
 
 The client in `clj-http.lite.core` makes HTTP requests according to a given
 Ring request map and returns Ring response maps corresponding to the
-resulting HTTP response. The function `clj-http.lite.client/request` uses
+resulting HTTP response. The function `clj-http-lite.client/request` uses
 Ring-style middleware to layer functionality over the core HTTP
-request/response implementation. Methods like `clj-http.lite.client/get`
-are sugar over this `clj-http.lite.client/request` function.
+request/response implementation. Methods like `clj-http-lite.client/get`
+are sugar over this `clj-http-lite.client/request` function.
 
 ## Development
 

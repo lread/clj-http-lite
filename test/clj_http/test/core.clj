@@ -55,7 +55,7 @@
     (->> s
          .getConnectors
          (filter (comp #{SslSelectChannelConnector} class))
-         ^org.eclipse.jetty.server.nio.SslSelectChannelConnector (first)
+         ^org.eclipse.jetty.server.ssl.SslSelectChannelConnector (first)
          .getLocalPort)))
 
 (defn with-server [t]
