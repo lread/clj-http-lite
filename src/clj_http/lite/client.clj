@@ -1,11 +1,11 @@
 (ns clj-http.lite.client
   "Batteries-included HTTP client."
-  (:use [slingshot.slingshot :only [throw+]])
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clj-http.lite.core :as core]
             [clj-http.lite.links :refer [wrap-links]]
-            [clj-http.lite.util :as util])
+            [clj-http.lite.util :as util]
+            [slingshot.slingshot :refer [throw+]])
   (:import (java.io InputStream File)
            (java.net URL UnknownHostException))
   (:refer-clojure :exclude (get update)))

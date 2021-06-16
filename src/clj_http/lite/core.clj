@@ -47,8 +47,9 @@
   (proxy [HostnameVerifier] []
     (verify [^String hostname ^SSLSession session] true)))
 
-(defn trust-invalid-manager []
+(defn trust-invalid-manager
   "This allows the ssl socket to connect with invalid/self-signed SSL certs."
+  []
   (reify X509TrustManager
     (getAcceptedIssuers [this] nil)
     (checkClientTrusted [this certs authType])
@@ -62,20 +63,20 @@
    the clj-http uses ByteArrays for the bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body socket-timeout
-           conn-timeout multipart debug insecure? save-request? follow-redirects
+           conn-timeout debug insecure? save-request? follow-redirects
            chunk-size] :as req}]
   (let [http-url (str (name scheme) "://" server-name
                       (when server-port (str ":" server-port))
                       uri
                       (when query-string (str "?" query-string)))
         _ (when insecure?
-            (do (HttpsURLConnection/setDefaultSSLSocketFactory
+            (HttpsURLConnection/setDefaultSSLSocketFactory
                   (.getSocketFactory
                     (doto (SSLContext/getInstance "SSL")
                       (.init nil (into-array TrustManager [(trust-invalid-manager)])
                              (new SecureRandom)))))
-                (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier))))
-        ^HttpURLConnection conn (.openConnection ^URL (URL. http-url))]
+            (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))
+        ^HttpURLConnection conn (.openConnection (URL. http-url))]
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
                                                     "; charset="

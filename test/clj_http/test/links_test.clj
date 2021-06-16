@@ -1,7 +1,7 @@
 (ns clj-http.test.links-test
   "Imported from https://github.com/dakrone/clj-http/blob/217393258e7863514debece4eb7b23a7a3fa8bd9/test/clj_http/test/links_test.clj"
-  (:require [clj-http.lite.links :refer :all]
-            [clojure.test :refer :all]))
+  (:require [clj-http.lite.links :refer [wrap-links]]
+            [clojure.test :refer [deftest is testing]]))
 
 (defn- link-handler [link-header]
   (wrap-links (constantly {:headers {"link" link-header}})))
