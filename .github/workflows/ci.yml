@@ -50,4 +50,7 @@ jobs:
           # Install just one or all simultaneously
           cli: 1.10.3.1029 # Clojure CLI based on tools.deps
       - name: Deploy
+        env:
+          CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
+          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
         run: clojure -T:build maybe-deploy
