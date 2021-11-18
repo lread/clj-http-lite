@@ -15,7 +15,7 @@
      (do
        (let [v (r/version!)
              ;; commit count + 1 for README update
-             cc (inc (Integer/parseInt (r/commit-count!)))
+             cc (inc (Integer/parseInt (t/git-count-revs)))
              rt (r/release-tag (r/commit-count-version v cc))]
          (t/replace-version "README.md" v cc)
          (t/replace-version "project.clj" v cc)
