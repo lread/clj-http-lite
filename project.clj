@@ -3,8 +3,7 @@
   :url "https://github.com/martinklepsch/clj-http-lite/"
   :license {:name "MIT"
             :url "http://www.opensource.org/licenses/mit-license.php"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [slingshot "0.12.2"]]
+  :dependencies [[org.clojure/clojure "1.8.0"]]
   :profiles {:test {:dependencies   [[ring/ring-jetty-adapter "1.3.2"]
                                      [ch.qos.logback/logback-classic "1.2.3"
                                       :exclusions [org.slf4j/slf4j-api]]

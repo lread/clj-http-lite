@@ -4,8 +4,7 @@
             [clojure.java.io :as io]
             [clj-http.lite.core :as core]
             [clj-http.lite.links :refer [wrap-links]]
-            [clj-http.lite.util :as util]
-            [slingshot.slingshot :refer [throw+]])
+            [clj-http.lite.util :as util])
   (:import (java.io InputStream File)
            (java.net URL UnknownHostException))
   (:refer-clojure :exclude (get update)))
@@ -36,7 +35,7 @@
       (if (or (not (clojure.core/get req :throw-exceptions true))
               (unexceptional-status? status))
         resp
-        (throw+ resp "clj-http: status %s" (:status %))))))
+        (throw (ex-info (str "clj-http: status " (:status resp)) resp))))))
 
 (declare wrap-redirects)
 
