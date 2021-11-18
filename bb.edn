@@ -25,7 +25,7 @@
              rt (r/release-tag (r/commit-count-version v cc))]
          (replace-version "README.md" v cc)
          (replace-version "project.clj" v cc)
-         (shell "git add README.md")
+         (shell "git add README.md project.clj")
          (shell "git commit -m 'Bump version in README'")
          (shell "git push"))
        (r/release!))
