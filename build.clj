@@ -12,12 +12,13 @@
 (defn clean [_]
   (b/delete {:path "target"}))
 
-(defn jar [_]
-  (b/write-pom {:class-dir class-dir
-                :lib lib
-                :version version
-                :basis basis
-                :src-dirs ["src"]})
+(defn jar [opts]
+  (b/write-pom (merge {:class-dir class-dir
+                       :lib lib
+                       :version version
+                       :basis basis
+                       :src-dirs ["src"]}
+                      opts))
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir})
   (b/jar {:class-dir class-dir
