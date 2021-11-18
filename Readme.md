@@ -144,32 +144,29 @@ as a primitive for building higher-level interfaces:
 ### Exceptions
 
 The client will throw exceptions on, well, exceptional status
-codes. clj-http will throw a
-[Slingshot](http://github.com/scgilardi/slingshot) Stone that can be
-caught by a regular `(catch Exception e ...)` or in Slingshot's `try+`
-block:
+codes. clj-http will throw an `ex-info` with the response as `ex-data`.
 
 ```clojure
-(client/get "http://site.com/broken")
-=> Stone Object thrown by throw+: {:status 404, :headers {"server" "nginx/1.0.4",
-                                                          "x-runtime" "12ms",
-                                                          "content-encoding" "gzip",
-                                                          "content-type" "text/html; charset=utf-8",
-                                                          "date" "Mon, 17 Oct 2011 23:15 :36 GMT",
-                                                          "cache-control" "no-cache",
-                                                          "status" "404 Not Found",
-                                                          "transfer-encoding" "chunked",
-                                                          "connection" "close"},
-                                   :body "...body here..."}
-   clj-http.lite.client/wrap-exceptions/fn--227 (client.clj:37)
+user=> (client/get "http://site.com/broken")
+Execution error (ExceptionInfo) at clj-http.lite.client/wrap-exceptions$fn (client.clj:38).
+clj-http: status 404
+user=> (-> *e ex-data :status)
+404
+user=> (-> *e ex-data keys)
+(:headers :status :body)
+```
 
-;; You can also ignore exceptions and handle them yourself:
+You can also ignore exceptions and handle them yourself:
+
+``` clojure
 (client/get "http://site.com/broken" {:throw-exceptions false})
-;; Or ignore an unknown host (methods return 'nil' if this is set to
-;; true and the host does not exist:
+```
+
+Or ignore an unknown host (methods return 'nil' if this is set to true and the host does not exist:
+
+``` clojure
 (client/get "http://aoeuntahuf89o.com" {:ignore-unknown-host? true})
-````
-(spacing added by me to be human readable)
+```
 
 ### Proxies
 
