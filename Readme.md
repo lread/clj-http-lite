@@ -2,7 +2,7 @@
 
 A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with GraalVM.
 
-> This is a somewhat maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
+> This is a clj-commons maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
 
 [Installation](#installation) | [Usage](#usage) | [Known Issues](#known-issues) | [Design](#design) | [Development](#development)
 
