@@ -6,7 +6,6 @@
 (def version (format "0.4.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
-(def uber-file (format "target/%s-%s-standalone.jar" (name lib) version))
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 
 (defn clean [_]
@@ -23,11 +22,6 @@
   (b/jar {:class-dir class-dir
           :jar-file jar-file}))
 
-(def release-marker "Release-")
-
-(defn extract-version [tag]
-  (str/replace-first tag release-marker ""))
-
 (defn deploy [opts]
   (jar opts)
   ((requiring-resolve 'deps-deploy.deps-deploy/deploy)
@@ -36,6 +30,11 @@
            :pom-file (b/pom-path {:lib lib :class-dir class-dir})}
           opts))
   opts)
+
+(def release-marker "Release-")
+
+(defn extract-version [tag]
+  (str/replace-first tag release-marker ""))
 
 (defn maybe-deploy [opts]
   (if-let [tag (System/getenv "CIRCLE_TAG")]
