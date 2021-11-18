@@ -1,7 +1,9 @@
 ### Unreleased
 
+### 0.4.384
+
 - Support self-signed certificates via `:insecure? true` option
-- Remove dependency on Slingshot
+- Remove dependency on slingshot
 
 ### 0.4.3
 
