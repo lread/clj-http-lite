@@ -22,3 +22,13 @@ jobs:
         uses: actions/checkout@v2-beta
       - name: Run tests
         run: lein with-profile -user,-dev,+test,+${{ matrix.clojure-version }} do clean, test
+  bb-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Babashka
+        uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.6.4
+
+      - name: tests
+        run: bb test:bb
