@@ -5,6 +5,7 @@
 - Support self-signed certificates via `:insecure? true` option
 - Remove dependency on slingshot
 - Move to `org.clj-commons` group
+- Add compatibility with [babashka](https://babashka.org/)
 
 ### 0.4.3
 
