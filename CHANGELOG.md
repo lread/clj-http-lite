@@ -4,6 +4,7 @@
 
 - Support self-signed certificates via `:insecure? true` option
 - Remove dependency on slingshot
+- Move to `org.clj-commons` group
 
 ### 0.4.3
 
