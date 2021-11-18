@@ -34,7 +34,7 @@
   "Encode an array of bytes into a base64 encoded string."
   [unencoded]
   (if (try (import 'javax.xml.bind.DatatypeConverter)
-           (catch ClassNotFoundException _))
+           (catch Exception _))
     `(javax.xml.bind.DatatypeConverter/printBase64Binary ~unencoded)
     (do
       (import 'java.util.Base64)

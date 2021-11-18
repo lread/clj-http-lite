@@ -1,12 +1,11 @@
 (ns clj-http.lite.client
   "Batteries-included HTTP client."
-  (:require [clojure.string :as str]
-            [clojure.java.io :as io]
-            [clj-http.lite.core :as core]
+  (:require [clj-http.lite.core :as core]
             [clj-http.lite.links :refer [wrap-links]]
-            [clj-http.lite.util :as util])
-  (:import (java.io InputStream File)
-           (java.net URL UnknownHostException))
+            [clj-http.lite.util :as util]
+            [clojure.java.io :as io]
+            [clojure.string :as str])
+  (:import (java.net UnknownHostException))
   (:refer-clojure :exclude (get update)))
 
 (set! *warn-on-reflection* true)
@@ -104,7 +103,7 @@
         resp))))
 
 (defn wrap-input-coercion [client]
-  (fn [{:keys [body body-encoding length] :as req}]
+  (fn [{:keys [body body-encoding _length] :as req}]
     (if body
       (cond
        (string? body)
@@ -296,6 +295,6 @@
 (defmacro with-connection-pool
   "This macro is a no-op, but left in to support backward-compatibility
   with clj-http."
-  [opts & body]
+  [_opts & body]
   `(do
      ~@body))

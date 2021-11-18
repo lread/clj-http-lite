@@ -1,0 +1,7 @@
+{:paths ["bb"]
+ :deps {org.clj-commons/clj-http-lite {:local/root "."}}
+ :tasks
+ {test:clj {:doc "Run Clojure tests"
+            :task (clojure "-M:test")}
+  test:bb {:doc "Run babashka tests"
+           :task clj-http.lite.test-runner/-main}}}

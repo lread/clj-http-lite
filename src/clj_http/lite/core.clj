@@ -1,9 +1,8 @@
 (ns clj-http.lite.core
   "Core HTTP request/response implementation."
   (:require [clojure.java.io :as io])
-  (:import (java.io ByteArrayOutputStream InputStream IOException)
+  (:import (java.io ByteArrayOutputStream InputStream)
            (java.net URL HttpURLConnection)
-           (javax.net.ssl HttpsURLConnection SSLContext TrustManager X509TrustManager HostnameVerifier SSLSession)
            (java.security SecureRandom)))
 
 (set! *warn-on-reflection* true)
@@ -33,7 +32,7 @@
   [{:keys [as]} conn]
   (let [ins (try
               (.getInputStream ^HttpURLConnection conn)
-              (catch Exception e
+              (catch Exception _e
                 (.getErrorStream ^HttpURLConnection conn)))]
     (if (or (= :stream as) (nil? ins))
       ins
@@ -43,17 +42,37 @@
         (.flush baos)
         (.toByteArray baos)))))
 
-(defn my-host-verifier []
-  (proxy [HostnameVerifier] []
-    (verify [^String hostname ^SSLSession session] true)))
+(def ^:private insecure-mode
+  (delay (throw (ex-info "insecure? option not supported in this environment"
+                         {}))))
 
-(defn trust-invalid-manager
-  "This allows the ssl socket to connect with invalid/self-signed SSL certs."
-  []
-  (reify X509TrustManager
-    (getAcceptedIssuers [this] nil)
-    (checkClientTrusted [this certs authType])
-    (checkServerTrusted [this certs authType])))
+(defmacro ^:private def-insecure []
+  (when (try (import '[javax.net.ssl
+                       HttpsURLConnection SSLContext TrustManager X509TrustManager HostnameVerifier SSLSession])
+             (catch Exception _))
+    '(do
+       (defn- my-host-verifier []
+         (proxy [HostnameVerifier] []
+           (verify [^String hostname ^javax.net.ssl.SSLSession session] true)))
+
+       (defn trust-invalid-manager
+         "This allows the ssl socket to connect with invalid/self-signed SSL certs."
+         []
+         (reify javax.net.ssl.X509TrustManager
+           (getAcceptedIssuers [this] nil)
+           (checkClientTrusted [this certs authType])
+           (checkServerTrusted [this certs authType])))
+
+       (def ^:private insecure-mode
+         (delay
+           (HttpsURLConnection/setDefaultSSLSocketFactory
+            (.getSocketFactory
+             (doto (SSLContext/getInstance "SSL")
+               (.init nil (into-array TrustManager [(trust-invalid-manager)])
+                      (new java.security.SecureRandom)))))
+           (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))))))
+
+(def-insecure)
 
 (defn request
   "Executes the HTTP request corresponding to the given Ring request map and
@@ -70,12 +89,7 @@
                       uri
                       (when query-string (str "?" query-string)))
         _ (when insecure?
-            (HttpsURLConnection/setDefaultSSLSocketFactory
-                  (.getSocketFactory
-                    (doto (SSLContext/getInstance "SSL")
-                      (.init nil (into-array TrustManager [(trust-invalid-manager)])
-                             (new SecureRandom)))))
-            (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))
+            @insecure-mode)
         ^HttpURLConnection conn (.openConnection (URL. http-url))]
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
