@@ -1,9 +1,10 @@
 (ns build
-  (:require [clojure.string :as str]
+  (:require [build-shared :as shared]
+            [clojure.string :as str]
             [clojure.tools.build.api :as b]))
 
 (def lib 'org.clj-commons/clj-http-lite)
-(def version (format "0.4.%s" (b/git-count-revs nil)))
+(def version shared/version)
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
