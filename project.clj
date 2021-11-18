@@ -1,4 +1,4 @@
-(defproject org.martinklepsch/clj-http-lite "0.4.277"
+(defproject org.martinklepsch/clj-http-lite "0.4.278"
   :description "A Clojure HTTP library similar to clj-http, but more lightweight."
   :url "https://github.com/martinklepsch/clj-http-lite/"
   :license {:name "MIT"
