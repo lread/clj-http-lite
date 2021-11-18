@@ -6,7 +6,8 @@
 (defn git-count-revs []
   (-> (apply sh (str/split "git rev-list HEAD --count" #" "))
       :out
-      str/trim))
+      str/trim
+      Integer/parseInt))
 
 (def base-version (edn/read-string (slurp "version.edn")))
 (def version (str base-version "." (git-count-revs)))

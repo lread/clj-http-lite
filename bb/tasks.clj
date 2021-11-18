@@ -4,16 +4,15 @@
             [clojure.string :as str]))
 
 (defn replace-version [file version cc]
-  (prn version cc)
   (spit file
         (str/replace (slurp file)
                      (re-pattern (format "(%s)\\.(\\d+)" version))
                      (fn [[_ version _]]
                        (str version "." cc)))))
 
-(defn deploy []
+(defn publish []
   (let [;; commit count + 1 for README update
-        cc (inc (Integer/parseInt (shared/git-count-revs)))
+        cc (inc (shared/git-count-revs))
         tag (str "Release-" shared/version)]
     (replace-version "README.md" shared/base-version cc)
     (replace-version "project.clj" shared/base-version cc)

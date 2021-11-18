@@ -6,5 +6,5 @@
             :task (clojure "-M:test")}
   test:bb {:doc "Run babashka tests"
            :task clj-http.lite.test-runner/-main}
-  deploy
-  {:task (t/deploy)}}}
+  publish
+  {:task (t/publish)}}}
