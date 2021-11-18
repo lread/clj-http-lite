@@ -10,4 +10,6 @@
       Integer/parseInt))
 
 (def base-version (edn/read-string (slurp "version.edn")))
-(def version (str base-version "." (git-count-revs)))
+
+(defn version [revs]
+  (str base-version "." revs))

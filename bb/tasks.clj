@@ -13,7 +13,7 @@
 (defn publish []
   (let [;; commit count + 1 for README update
         cc (inc (shared/git-count-revs))
-        tag (str "Release-" shared/version)]
+        tag (str "Release-" (shared/version cc))]
     (replace-version "README.md" shared/base-version cc)
     (replace-version "project.clj" shared/base-version cc)
     (shell "git add README.md project.clj")
