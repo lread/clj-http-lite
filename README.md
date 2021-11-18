@@ -214,7 +214,9 @@ are sugar over this `clj-http.lite.client/request` function.
 
 ## Development
 
-To run the tests:
+### Tests
+
+To run the tests for the JVM:
 
     $ lein deps
     $ lein test
@@ -224,6 +226,15 @@ To run the tests:
 
     Run tests against 1.2.1, 1.3, 1.4 and 1.5
     $ lein all do clean, test :all
+
+To run the tests for babashka:
+
+    $ bb test:bb
+
+### Release
+
+To release a new version, run `bb publish` which will push a new tag. CI will
+take care of the rest.
 
 ## License
 
