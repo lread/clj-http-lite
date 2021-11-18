@@ -25,6 +25,8 @@ jobs:
   bb-test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
       - name: Setup Babashka
         uses: turtlequeue/setup-babashka@v1.3.0
         with:
