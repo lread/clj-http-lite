@@ -1,4 +1,4 @@
-(defproject org.martinklepsch/clj-http-lite "0.4.283"
+(defproject org.clj-commons/clj-http-lite "0.4.284"
   :description "A Clojure HTTP library similar to clj-http, but more lightweight."
   :url "https://github.com/martinklepsch/clj-http-lite/"
   :license {:name "MIT"
@@ -19,4 +19,8 @@
                    :all         (constantly true)
                    :unit        #(not (:integration %))
                    :integration :integration}
-  :checksum-deps true)
+  :checksum-deps true
+  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
+                                    :username :env/clojars_user
+                                    :password :env/clojars_pass
+                                    :sign-releases false}]])
