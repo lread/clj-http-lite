@@ -3,7 +3,13 @@
         org.clj-commons/infra {:git/url "https://github.com/clj-commons/infra"
                                :git/sha "a3ebcff4d32c4b84f001f86cdee5c76358d15ea5"}}
  :tasks
- {test:clj {:doc "Run Clojure tests"
+ {:init (defn replace-version [file version cc]
+          (spit file
+                (str/replace (slurp file)
+                             (re-pattern (format "(%s)\\.(\\d+)" version))
+                             (fn [[_ version _]]
+                               (str version "." cc)))))
+  test:clj {:doc "Run Clojure tests"
             :task (clojure "-M:test")}
   test:bb {:doc "Run babashka tests"
            :task clj-http.lite.test-runner/-main}
@@ -17,11 +23,8 @@
              ;; commit count + 1 for README update
              cc (inc (Integer/parseInt (r/commit-count!)))
              rt (r/release-tag (r/commit-count-version v cc))]
-         (spit "README.md"
-               (str/replace (slurp "README.md")
-                            (re-pattern (format "(%s)\\.(\\d+)" v))
-                            (fn [[_ version _]]
-                              (str version "." cc))))
+         (replace-version "README.md" v cc)
+         (replace-version "project.clj" v cc)
          (shell "git add README.md")
          (shell "git commit -m 'Bump version in README'")
          (shell "git push"))
