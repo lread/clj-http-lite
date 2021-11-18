@@ -1,4 +1,4 @@
-### unreleased
+### Unreleased
 
 - Support self-signed certificates via `:insecure? true` option
 - Remove dependency on Slingshot
@@ -9,7 +9,7 @@
 
 ### 0.4.2
 
-- Add type hints for GraalVM ([#2](https://github.com/martinklepsch/clj-http-lite/pull/2))
+- Add type hints for GraalVM ([#2](https://github.com/clj-commons/clj-http-lite/pull/2))
 
 ### 0.4.0
 
