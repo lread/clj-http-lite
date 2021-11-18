@@ -21,8 +21,8 @@
                      :src-dirs ["src"]}
                     opts)
         opts (assoc opts :scm
-                    {:url "https://github.com/clj-commons/clj-http-lite"
-                     :tag (:version opts)})]
+                    (cond-> {:url "https://github.com/clj-commons/clj-http-lite"}
+                      (:tag opts) (assoc :tag (:tag opts))))]
     (b/write-pom opts))
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir})
@@ -55,7 +55,9 @@
         (do
           (println "Releasing to clojars...")
           (-> opts
-              (assoc :lib lib :version (extract-version tag))
+              (assoc :lib lib
+                     :version (extract-version tag)
+                     :tag tag)
               (deploy)))
         (do
           (println "Tag is not a release tag, skipping deploy")
