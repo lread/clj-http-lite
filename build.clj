@@ -8,17 +8,22 @@
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
+(def github-repo "https://github.com/clj-commons/clj-http-lite")
 
 (defn clean [_]
   (b/delete {:path "target"}))
 
 (defn jar [opts]
-  (b/write-pom (merge {:class-dir class-dir
-                       :lib lib
-                       :version version
-                       :basis basis
-                       :src-dirs ["src"]}
-                      opts))
+  (let [opts (merge {:class-dir class-dir
+                     :lib lib
+                     :version version
+                     :basis basis
+                     :src-dirs ["src"]}
+                    opts)
+        opts (assoc opts :scm
+                    {:url "https://github.com/clj-commons/clj-http-lite"
+                     :tag (:version opts)})]
+    (b/write-pom opts))
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir})
   (b/jar {:class-dir class-dir
