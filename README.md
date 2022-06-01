@@ -1,4 +1,4 @@
-# `clj-http-lite` [![cljdoc badge](https://cljdoc.xyz/badge/org.clj-commons/clj-http-lite)](https://cljdoc.xyz/d/org.clj-commons/clj-http-lite/CURRENT) [![CI](https://github.com/martinklepsch/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/martinklepsch/clj-http-lite/actions)
+# `clj-http-lite` [![cljdoc badge](https://cljdoc.xyz/badge/org.clj-commons/clj-http-lite)](https://cljdoc.xyz/d/org.clj-commons/clj-http-lite/CURRENT) [![CI](https://github.com/martinklepsch/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/martinklepsch/clj-http-lite/actions) [![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://babashka.org)
 
 A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with GraalVM.
 
