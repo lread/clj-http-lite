@@ -214,20 +214,22 @@ are sugar over this `clj-http.lite.client/request` function.
 
 ## Development
 
-### Tests
+### Clojure JVM Tests
 
-To run the tests for the JVM:
+To run tests for the JVM:
 
-    $ lein deps
-    $ lein test
+    $ bb clean
+    $ bb deps
 
-    Run all tests (including integration):
-    $ lein test :all
+    Run all Clojure tests against minimum supported version of Clojure (1.8)
+    $ clojure -M:test
 
-    Run tests against 1.2.1, 1.3, 1.4 and 1.5
-    $ lein all do clean, test :all
+    Run Clojure against a specific Clojure version, for example 1.11
+    $ clojure -M:1.11:test
 
-To run the tests for babashka:
+### Babashka Tests
+
+To run a small suite of sanity tests for babashka (found under ./bb]):
 
     $ bb test:bb
 

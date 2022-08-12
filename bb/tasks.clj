@@ -1,7 +1,21 @@
 (ns tasks
-  (:require [babashka.tasks :refer [shell]]
+  (:require [babashka.tasks :refer [shell clojure]]
             [build-shared :as shared]
+            [clojure.edn :as edn]
             [clojure.string :as str]))
+
+(defn deps []
+  (let [aliases (->> "deps.edn"
+                     slurp
+                     edn/read-string
+                     :aliases
+                     keys)]
+    ;; one at a time because aliases with :replace-deps or override-deps will... well... you know.
+    (println "Bring down default deps")
+    (clojure "-P")
+    (doseq [a aliases]
+      (println "Bring down deps for alias" a)
+      (clojure "-P" (str "-M" a)))))
 
 (defn replace-version [file version cc]
   (spit file
