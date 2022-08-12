@@ -1,9 +1,7 @@
 {:paths ["." "bb"]
  :deps {org.clj-commons/clj-http-lite {:local/root "."}}
  :tasks
- {:requires ([tasks :as t]
-             [babashka.cli :as cli]
-             [clojure.set :as cset])
+ {:requires ([tasks :as t])
   deps
   {:doc "Bring down all the clojure deps"
    :task (t/deps)}

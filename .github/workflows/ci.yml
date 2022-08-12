@@ -28,10 +28,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
       - name: Setup Babashka
-        uses: turtlequeue/setup-babashka@v1.3.0
+        uses: DeLaGuardo/setup-clojure@9.4
         with:
-          babashka-version: 0.6.4
-
+          bb: 'latest'
       - name: tests
         run: bb test:bb
   deploy:
