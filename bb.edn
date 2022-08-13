@@ -2,9 +2,15 @@
  :deps {org.clj-commons/clj-http-lite {:local/root "."}}
  :tasks
  {:requires ([tasks :as t])
-  test:clj {:doc "Run Clojure tests"
-            :task (clojure "-M:test")}
-  test:bb {:doc "Run babashka tests"
-           :task clj-http.lite.test-runner/-main}
+  deps
+  {:doc "Bring down all the clojure deps"
+   :task (t/deps)}
+  clean
+  {:doc "Delete any work dirs"
+   :task (clojure "-T:build clean")}
+  test:bb
+  {:doc "Run babashka tests"
+   :task clj-http.lite.test-runner/-main}
   publish
-  {:task (t/publish)}}}
+  {:doc "Trigger a release to clojars"
+   :task (t/publish)}}}
