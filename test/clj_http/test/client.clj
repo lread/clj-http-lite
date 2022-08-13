@@ -167,6 +167,7 @@
 (deftest apply-on-input-coercion
   (let [i-client (client/wrap-input-coercion identity)]
     (doseq [[in-body encoding expected-encoding] [["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" nil            "UTF-8"]
+                                                  ["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" "UTF-8"        "UTF-8"]
                                                   ["plain text"                "ASCII"        "ASCII"]
                                                   ["sõme ßÒññÝ chÀråcters"     "windows-1252" "windows-1252"]]]
       (let [resp (i-client {:body in-body :body-encoding encoding})
