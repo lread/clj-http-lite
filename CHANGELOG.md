@@ -1,5 +1,9 @@
 ### Unreleased
 
+- Body encoding now repects requested encoding and defaults to UTF-8 ([#18](https://github.com/clj-commons/clj-http-lite/issues/18)) ([@lread](https://github.com/lread))
+- Quality
+  - Automated CI testing added for Windows ([#21](https://github.com/clj-commons/clj-http-lite/issues/21)) ([@lread](https://github.com/lread))
+
 ### 0.4.384
 
 - Support self-signed certificates via `:insecure? true` option

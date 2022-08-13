@@ -5,7 +5,8 @@
             [clj-http.lite.util :as util]
             [clojure.java.io :as io]
             [clojure.string :as str])
-  (:import (java.net UnknownHostException))
+  (:import (java.net UnknownHostException)
+           (java.nio.charset Charset))
   (:refer-clojure :exclude (get update)))
 
 (set! *warn-on-reflection* true)
@@ -106,12 +107,13 @@
   (fn [{:keys [body body-encoding _length] :as req}]
     (if body
       (cond
-       (string? body)
-       (client (-> req (assoc :body (.getBytes ^String body)
-                              :character-encoding (or body-encoding
-                                                      "UTF-8"))))
-       :else
-       (client req))
+        (string? body)
+        (let [encoding-name (or body-encoding "UTF-8")
+              charset (Charset/forName encoding-name)]
+          (client (-> req (assoc :body (.getBytes ^String body charset)
+                                 :character-encoding encoding-name))))
+        :else
+        (client req))
       (client req))))
 
 (defn content-type-value [type]
