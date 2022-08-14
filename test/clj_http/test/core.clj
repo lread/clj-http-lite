@@ -4,11 +4,12 @@
             [clojure.pprint :as pp]
             [clojure.java.io :refer [file]]
             [clojure.test :refer [deftest is use-fixtures]]
+            [clojure.string :as str]
             [ring.adapter.jetty :as ring])
   (:import (java.io ByteArrayInputStream)
-           (org.eclipse.jetty.server Server)
-           (org.eclipse.jetty.server.nio SelectChannelConnector)
-           (org.eclipse.jetty.server.ssl SslSelectChannelConnector)))
+           (org.eclipse.jetty.server Server ServerConnector)))
+
+(set! *warn-on-reflection* true)
 
 (defn handler [req]
   (condp = [(:request-method req) (:uri req)]
@@ -42,21 +43,18 @@
 
 (def ^:dynamic *server* nil)
 
-(defn current-port []
+(defn- port-for-protocol [p]
   (let [^Server s *server*]
-    (->> s
-         .getConnectors
-         (filter (comp #{SelectChannelConnector} class))
-         ^SelectChannelConnector (first)
-         .getLocalPort)))
+    (some (fn [^ServerConnector c]
+            (when (str/starts-with? (str/lower-case (.getDefaultProtocol c)) p)
+              (.getLocalPort c)))
+          (.getConnectors s))))
+
+(defn current-port []
+  (port-for-protocol "http/"))
 
 (defn current-https-port []
-  (let [^Server s *server*]
-    (->> s
-         .getConnectors
-         (filter (comp #{SslSelectChannelConnector} class))
-         ^SslSelectChannelConnector (first)
-         .getLocalPort)))
+  (port-for-protocol "ssl"))
 
 (defn with-server [t]
   (let [s (make-server)]
