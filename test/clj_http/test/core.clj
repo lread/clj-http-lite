@@ -165,7 +165,7 @@
 
 (deftest ^{:integration true} t-save-request-obj
   (let [resp (request {:request-method :post :uri "/post"
-                       :body           (.getBytes "foo bar")
+                       :body           (.getBytes "foo bar" "UTF-8")
                        :save-request?  true})]
     (is (= 200 (:status resp)))
     (is (= {:scheme         :http

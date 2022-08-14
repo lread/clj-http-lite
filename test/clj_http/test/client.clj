@@ -93,21 +93,21 @@
   (let [client (fn [req]
                  (is (= "gzip, deflate"
                         (get-in req [:headers "Accept-Encoding"])))
-                 {:body (util/gzip (util/utf8-bytes "foofoofoo"))
+                 {:body (util/gzip (util/utf8-bytes "foofoofooƒ⊙⊙"))
                   :headers {"Content-Encoding" "gzip"}})
         c-client (client/wrap-decompression client)
         resp (c-client {})]
-    (is (= "foofoofoo" (util/utf8-string (:body resp))))))
+    (is (= "foofoofooƒ⊙⊙" (util/utf8-string (:body resp))))))
 
 (deftest apply-on-deflated
   (let [client (fn [req]
                  (is (= "gzip, deflate"
                         (get-in req [:headers "Accept-Encoding"])))
-                 {:body (util/deflate (util/utf8-bytes "barbarbar"))
+                 {:body (util/deflate (util/utf8-bytes "barbarbar⒝⒜⒭"))
                   :headers {"Content-Encoding" "deflate"}})
         c-client (client/wrap-decompression client)
         resp (c-client {})]
-    (is (= "barbarbar" (util/utf8-string (:body resp))))))
+    (is (= "barbarbar⒝⒜⒭" (util/utf8-string (:body resp))))))
 
 (deftest pass-on-non-compressed
   (let [c-client (client/wrap-decompression (fn [req] {:body "foo"}))
@@ -141,11 +141,18 @@
   (is-passed client/wrap-accept-encoding
              {:uri "/foo"}))
 
-(deftest apply-on-output-coercion
-  (let [client (fn [req] {:body (util/utf8-bytes "foo")})
+(deftest apply-on-utf8-output-coercion
+  (let [client (fn [req] {:body (util/utf8-bytes "fooⓕⓞⓞ")})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo"})]
-    (is (= "foo" (:body resp)))))
+    (is (= "fooⓕⓞⓞ" (:body resp)))))
+
+(deftest apply-on-other-output-coercion
+  (let [client (fn [req] {:body (.getBytes "sõme ßÒññÝ chÀråcters" "windows-1252")
+                          :headers {"content-type" "text/foo;charset=windows-1252"}})
+        o-client (client/wrap-output-coercion client)
+        resp (o-client {:uri "/foo" :as :auto})]
+    (is (= "sõme ßÒññÝ chÀråcters" (:body resp)))))
 
 (deftest pass-on-no-output-coercion
   (let [client (fn [req] {:body nil})
@@ -158,15 +165,15 @@
     (is (= :thebytes (:body resp)))))
 
 (deftest apply-on-input-coercion
-  (let [i-client (client/wrap-input-coercion identity)
-        resp (i-client {:body "foo"})
-        resp2 (i-client {:body "foo2" :body-encoding "ASCII"})
-        data (slurp (:body resp))
-        data2 (slurp (:body resp2))]
-    (is (= "UTF-8" (:character-encoding resp)))
-    (is (= "foo" data))
-    (is (= "ASCII" (:character-encoding resp2)))
-    (is (= "foo2" data2))))
+  (let [i-client (client/wrap-input-coercion identity)]
+    (doseq [[in-body encoding expected-encoding] [["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" nil            "UTF-8"]
+                                                  ["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" "UTF-8"        "UTF-8"]
+                                                  ["plain text"                "ASCII"        "ASCII"]
+                                                  ["sõme ßÒññÝ chÀråcters"     "windows-1252" "windows-1252"]]]
+      (let [resp (i-client {:body in-body :body-encoding encoding})
+            decoded-body (slurp (:body resp) :encoding expected-encoding)]
+        (is (= expected-encoding (:character-encoding resp)) "character encoding")
+        (is (= in-body decoded-body) "body")))))
 
 (deftest pass-on-no-input-coercion
   (is-passed client/wrap-input-coercion
