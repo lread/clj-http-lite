@@ -237,7 +237,7 @@ To run a small suite of sanity tests for babashka (found under ./bb]):
 
 Our CI workflow lints sources with clj-kondo, and you can too!
 
-   $ bb lint
+    $ bb lint
 
 ### Release
 
