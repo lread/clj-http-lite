@@ -1,12 +1,10 @@
 (ns setup
   "This namespace will be automaticaly loaded by the test runner"
-  (:require
-   [clojure.string :as string])
   (:import
    (org.eclipse.jetty.util MultiException)))
 
 (-> (reify Thread$UncaughtExceptionHandler
-      (uncaughtException [_ thread e]
+      (uncaughtException [_ _thread e]
         ;; Omit exceptions coming from "Address already in use" because they're meaningless
         ;; (these happen when one picks port 0, and after one such exception a new port will be retried successfully)
         (let [omit? (or (-> ^Throwable e .getMessage #{"Address already in use"})

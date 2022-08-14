@@ -1,10 +1,9 @@
 (ns clj-http.test.client
   (:require [clj-http.lite.client :as client]
-            [clj-http.test.core :refer [base-req current-port with-server]]
+            [clj-http.test.core :refer [base-req with-server]]
             [clj-http.lite.util :as util]
             [clojure.test :refer [deftest is testing use-fixtures]])
-  (:import (java.net UnknownHostException)
-           (java.util Arrays)))
+  (:import (java.net UnknownHostException)))
 
 (use-fixtures :each with-server)
 
@@ -72,19 +71,19 @@
     (is (= "ok" (:body resp)))))
 
 (deftest throw-on-exceptional
-  (let [client (fn [req] {:status 500})
+  (let [client (fn [_req] {:status 500})
         e-client (client/wrap-exceptions client)]
     (is (thrown-with-msg? Exception #"500"
           (e-client {})))))
 
 (deftest pass-on-non-exceptional
-  (let [client (fn [req] {:status 200})
+  (let [client (fn [_req] {:status 200})
         e-client (client/wrap-exceptions client)
         resp (e-client {})]
     (is (= 200 (:status resp)))))
 
 (deftest pass-on-exceptional-when-surpressed
-  (let [client (fn [req] {:status 500})
+  (let [client (fn [_req] {:status 500})
         e-client (client/wrap-exceptions client)
         resp (e-client {:throw-exceptions false})]
     (is (= 500 (:status resp)))))
@@ -110,7 +109,7 @@
     (is (= "barbarbar⒝⒜⒭" (util/utf8-string (:body resp))))))
 
 (deftest pass-on-non-compressed
-  (let [c-client (client/wrap-decompression (fn [req] {:body "foo"}))
+  (let [c-client (client/wrap-decompression (fn [_req] {:body "foo"}))
         resp (c-client {:uri "/foo"})]
     (is (= "foo" (:body resp)))))
 
@@ -142,24 +141,24 @@
              {:uri "/foo"}))
 
 (deftest apply-on-utf8-output-coercion
-  (let [client (fn [req] {:body (util/utf8-bytes "fooⓕⓞⓞ")})
+  (let [client (fn [_req] {:body (util/utf8-bytes "fooⓕⓞⓞ")})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo"})]
     (is (= "fooⓕⓞⓞ" (:body resp)))))
 
 (deftest apply-on-other-output-coercion
-  (let [client (fn [req] {:body (.getBytes "sõme ßÒññÝ chÀråcters" "windows-1252")
+  (let [client (fn [_req] {:body (.getBytes "sõme ßÒññÝ chÀråcters" "windows-1252")
                           :headers {"content-type" "text/foo;charset=windows-1252"}})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo" :as :auto})]
     (is (= "sõme ßÒññÝ chÀråcters" (:body resp)))))
 
 (deftest pass-on-no-output-coercion
-  (let [client (fn [req] {:body nil})
+  (let [client (fn [_req] {:body nil})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo"})]
     (is (nil? (:body resp))))
-  (let [client (fn [req] {:body :thebytes})
+  (let [client (fn [_req] {:body :thebytes})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo" :as :byte-array})]
     (is (= :thebytes (:body resp)))))

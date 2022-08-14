@@ -233,6 +233,12 @@ To run a small suite of sanity tests for babashka (found under ./bb]):
 
     $ bb test:bb
 
+### Linting
+
+Our CI workflow lints sources with clj-kondo, and you can too!
+
+   $ bb lint
+
 ### Release
 
 To release a new version, run `bb publish` which will push a new tag. CI will

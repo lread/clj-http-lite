@@ -2,6 +2,47 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
+  lint:
+    run-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.2
+
+      - name: Clojure deps cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.deps.clj
+            ~/.gitlibs
+          key: cljdeps-${{ hashFiles('deps.edn', 'bb.edn') }}
+          restore-keys: cljdeps-
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Clojure Tooling
+        uses: DeLaGuardo/setup-clojure@9.4
+        with:
+          bb: 'latest'
+
+      - name: Tools versions
+        run: |
+          echo "bb --version"
+          bb --version
+          echo "java -version"
+          java -version
+
+      - name: Bring down deps
+        run: bb deps
+
+      - name: Lint
+        run: bb lint
+
   test:
     runs-on: ${{ matrix.os }}-latest
     strategy:
@@ -101,6 +142,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs:
+      - lint
       - test
       - bb-test
 

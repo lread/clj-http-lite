@@ -1,5 +1,7 @@
 {:paths ["." "bb"]
- :deps {org.clj-commons/clj-http-lite {:local/root "."}}
+ :deps {org.clj-commons/clj-http-lite {:local/root "."}
+        lread/status-line {:git/url "https://github.com/lread/status-line.git"
+                           :sha "35ed39645038e81b42cb15ed6753b8462e60a06d"}}
  :tasks
  {:requires ([tasks :as t])
   deps
@@ -11,6 +13,9 @@
   test:bb
   {:doc "Run babashka tests"
    :task clj-http.lite.test-runner/-main}
+  lint
+  {:doc "[--rebuild] Lint source code"
+   :task lint/-main}
   publish
   {:doc "Trigger a release to clojars"
    :task (t/publish)}}}
