@@ -1,13 +1,10 @@
 (ns clj-http.test.core
   (:require [clj-http.lite.core :as core]
             [clj-http.lite.util :as util]
-            [clojure.pprint :as pp]
-            [clojure.java.io :refer [file]]
             [clojure.test :refer [deftest is use-fixtures]]
             [clojure.string :as str]
             [ring.adapter.jetty :as ring])
-  (:import (java.io ByteArrayInputStream)
-           (org.eclipse.jetty.server Server ServerConnector)))
+  (:import (org.eclipse.jetty.server Server ServerConnector)))
 
 (set! *warn-on-reflection* true)
 

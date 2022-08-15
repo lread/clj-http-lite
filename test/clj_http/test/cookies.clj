@@ -1,6 +1,6 @@
 (ns clj-http.test.cookies
-  (:use [clj-http.lite.util]
-        [clojure.test]))
+  #_(:use [clj-http.lite.util]
+          [clojure.test]))
 
 ;; (defn refer-private [ns]
 ;;   (doseq [[symbol var] (ns-interns ns)]
