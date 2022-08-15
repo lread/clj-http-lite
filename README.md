@@ -16,13 +16,20 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 
 ## Differences from clj-http
 
-- Instead of Apache HTTP client, clj-http-lite uses HttpURLConnection
+- Instead of Apache HttpClient, clj-http-lite uses HttpURLConnection
 - No automatic JSON decoding for response bodies
 - No cookie support
 - No proxy-ing DELETEs with body
 - No multipart form uploads
 - No persistent connection support
 - namespace rename clj-http.* -> clj-http.lite.*
+
+## History
+
+- Sep 2011 - [dakrone/clj-http](https://github.com/dakrone/clj-http) created (and is still actively maintained)
+- Feb 2012 - [hiredman/clj-http-lite](https://github.com/hiredman/clj-http-lite) (now archived) forked from `dakrone/clj-http` to use Java's HttpURLConnection instead of Apache HttpClient.
+- Jul 2018 - `martinklepsch/clj-http-lite` forked from `hiredman/clj-http-lite` for new development and maintenance
+- Nov 2021 - Martin transfered his fork to `clj-commons/clj-http-lite` so it could get the ongoing love it needs from the Clojure community
 
 ## Usage
 
