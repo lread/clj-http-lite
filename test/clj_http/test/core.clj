@@ -4,9 +4,16 @@
             [clojure.test :refer [deftest is use-fixtures]]
             [clojure.string :as str]
             [ring.adapter.jetty :as ring])
-  (:import (org.eclipse.jetty.server Server ServerConnector)))
+  (:import (org.eclipse.jetty.server Server ServerConnector)
+           (java.util Base64)))
 
 (set! *warn-on-reflection* true)
+
+(defn b64-decode [^String s]
+  (when s
+    (-> (Base64/getDecoder)
+        (.decode s)
+        util/utf8-string)))
 
 (defn handler [req]
   (condp = [(:request-method req) (:uri req)]
@@ -20,7 +27,7 @@
     {:status 200 :body (get-in req [:headers "x-my-header"])}
     [:post "/post"]
     {:status 200 :body (slurp (:body req))}
-    [:get "/redirect"] {:status 302 :headers {"Location" "/get"} }
+    [:get "/redirect"] {:status 302 :headers {"Location" "/get"}}
     [:get "/error"]
     {:status 500 :body "o noes"}
     [:get "/timeout"]
@@ -28,7 +35,17 @@
       (Thread/sleep 10)
       {:status 200 :body "timeout"})
     [:delete "/delete-with-body"]
-    {:status 200 :body "delete-with-body"}))
+    {:status 200 :body "delete-with-body"}
+    ;; minimal to support testing
+    [:get "/basic-auth"]
+    (let [cred (some->> (get (:headers req) "authorization")
+                        (re-find #"^Basic (.*)$")
+                        last
+                        b64-decode)
+      [user pass] (and cred (str/split cred #":"))]
+      (if (and (= "username" user) (= "password" pass))
+        {:status 200 :body "welcome"}
+        {:status 401 :body "denied"}))))
 
 (defn make-server ^Server []
   (ring/run-jetty handler {:port         0 ;; Use a free port
@@ -204,3 +221,4 @@
   (let [stream (:body (request {:request-method :get :uri "/get" :as :stream}))
         body (slurp stream)]
     (is (= "get" body))))
+
