@@ -19,9 +19,7 @@
                 org.slf4j/jcl-over-slf4j {:mvn/version "1.7.36"}
                 org.slf4j/jul-to-slf4j {:mvn/version "1.7.36"}
                 org.slf4j/log4j-over-slf4j {:mvn/version "1.7.36"}}
-   :main-opts ["-m" "cognitect.test-runner"
-               ;; our test namespaces do not always end in -test, hence the override:
-               "--namespace-regex" "clj-http\\.test\\..*"]}
+   :main-opts ["-m" "cognitect.test-runner"]}
   ;; for consistent linting we use a specific version of clj-kondo through the jvm
   :clj-kondo {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.08.03"}}
               :override-deps {org.clojure/clojure {:mvn/version "1.11.1"}}
