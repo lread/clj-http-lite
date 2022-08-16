@@ -1,5 +1,8 @@
 (ns clj-http.lite.client
-  "Batteries-included HTTP client."
+  "Batteries-included HTTP client.
+
+  Among the many functions here you'll likely be most interested in
+  [[get]] [[head]] [[put]] [[post]] [[delete]] or the slightly lower level [[request]]."
   (:require [clj-http.lite.core :as core]
             [clj-http.lite.links :refer [wrap-links]]
             [clj-http.lite.util :as util]
@@ -233,8 +236,7 @@
       (client req))))
 
 (defn wrap-request
-  "Returns a battaries-included HTTP request function coresponding to the given
-   core client. See client/client."
+  "Returns a batteries-included HTTP request function."
   [request]
   ;; note to the uninitiated: wrapper behaviour is applied to requests in order listed here but
   ;; from last to first
@@ -257,51 +259,101 @@
       wrap-links
       wrap-unknown-host))
 
-(def #^{:doc
-        "Executes the HTTP request corresponding to the given map and returns
-   the response map for corresponding to the resulting HTTP response.
-
-   In addition to the standard Ring request keys, the following keys are also
-   recognized:
-   * :url
-   * :method
-   * :query-params
-   * :basic-auth
-   * :content-type
-   * :accept
-   * :accept-encoding
-   * :as
-
-  The following additional behaviors over also automatically enabled:
-   * Exceptions are thrown for status codes other than 200-207, 300-303, or 307
-   * Gzip and deflate responses are accepted and decompressed
-   * Input and output bodies are coerced as required and indicated by the :as
-     option."}
+(def ^{:arglists '([req])}
   request
+  "Returns response map for executed HTTP `req` map.
+
+   Notice that some `req` key entries will be overwritten by automatic conversion to other key entries:
+
+   Request method
+   * `:method` -  ex. `:get`,`:head`,`:post`,`:put`,`:delete`, converts to `:request-method` with same value
+
+   Request URL
+   * `:url` - ex. `\"https://joe:blow@example.com:443/some/path?q=clojure\"`, converts to:
+     * `:scheme` - protocol `:https`
+     * `:server-name` - host `\"example.com\"`
+     * `:server-port` - `443` (if not specified, will be inferred from `:scheme`)
+     * `:uri` - path `\"/some/path\"`
+     * `:user-info` -  `\"joe:blow\"`, converts to:
+       * `:basic-auth` - which automatically converts to appropriate `:headers`
+     * `:query-string` - `\"q=clojure\"`
+   * `:query-params` - ex. `{\"q\" \"clojure\"}` or `{:q \"clojure\"}` converts to `:query-string` (see above)
+
+   Request body & headers
+   * `:body` - can be a string, byte array, File or input stream
+   * `:body-encoding` - charset ex. `\"UTF-16\"`, defaults to `\"UTF-8\"`, iff `:body` is string converts to:
+      * `:body` encoded in charset
+      * `:character-encoding` set to charset which converts to appropriate `:headers` iff `:content-type` also set
+   * `:content-type` - media type of request body, converts to appropriate `:headers` entry, specify:
+     * keyword as shorthand, ex. `:json` for `\"application/json\"`
+     * string for verboten, ex. `\"text/html\"`
+   * `:form-params` - ex. `{\"q\" \"clojure\"}` or `{:q \"clojure\"}`, iff `:method` is `:post`: converts to:
+      * urlencoded `:body`
+      * appropriate `:headers` entry
+   * `:oauth-token` - bearer authorization token, ex. `\"my70k3nh3r3\"`, converts to appropriate `:headers` entry
+   * `:basic-auth` - basic authentication, converts to appropriate `:headers` entry, (see also `:url` and `:user-info`), specify:
+     * vector `[\"uname\" \"pass\"]` becomes `\"uname:pass\"`
+     * use string for verboten
+   * `:accept-encoding` - vector of accepted response encodings, ex. `[:gzip :deflate :identity]`, converts to appropriate `:headers` entry
+   * `:accept` - accept response of media type, converts to appropriate `:headers` entry, specify
+     * keyword as shorthand, ex. `:json` for `\"application/json\"`
+     * string for verboten, ex. `\"text/html\"`
+   * `:headers` - explicitly set request headers, ex. `{\"Cache-Control\" \"no-cache\"}`
+
+   Request behaviour
+   * `:as` - specifies how response body should be coerced:
+     * `:stream`
+     * `:byte-array`
+     * `:auto` - to string decoded with `charset` in response `:headers` `content-type` `charset` else UTF-8
+     * `\"charset\"` - to string decoded with `charset` ex. `\"utf-16\"`
+     * else - to string decoded with UTF-8
+   * `:follow-redirects` - specify `false` to not follow response redirects
+   * `:throw-exceptions` - specify `false` to not throw on https status error codes
+   * `:ignore-unknown-host?` - specify `true` to not throw on unknown host
+   * `:insecure?` - allow connection with an invalid SSL certificate
+   * `:conn-timeout` - number of milliseconds to wait to establish a connection
+   * `:socket-timeout` - number of milliseconds to wait for data to be available to read
+   * `:save-request?` - specify `true` to include ultimate converted `:request` used in response map
+   * `:chunk-size` - in bytes, enables streaming of HTTP request body with chunk-size bytes,
+see [JDK docs](https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html#setChunkedStreamingMode-int-)
+for details
+
+  Response map keys:
+  * `:status` - http status code, see `:throw-exceptions` above
+  * `:headers` - response headers
+  * `:body` - response body, gzip and deflate responses are accepted and decompressed. See `:as` above.
+  * `:request` - see `:save-request?` above
+
+  See [README](/README.md#usage) for example usages."
   (wrap-request #'core/request))
 
 (defn get
-  "Like #'request, but sets the :method and :url as appropriate."
+  "Executes HTTP GET request for `url` and, optionally, more `req` attributes.
+  See [[request]]."
   [url & [req]]
   (request (merge req {:method :get :url url})))
 
 (defn head
-  "Like #'request, but sets the :method and :url as appropriate."
+  "Executes HTTP HEAD request for `url` and, optionally, more `req` attributes.
+  See [[request]]."
   [url & [req]]
   (request (merge req {:method :head :url url})))
 
 (defn post
-  "Like #'request, but sets the :method and :url as appropriate."
+  "Executes HTTP POST request for `url` and, optionally, more `req` attributes.
+  See [[request]]."
   [url & [req]]
   (request (merge req {:method :post :url url})))
 
 (defn put
-  "Like #'request, but sets the :method and :url as appropriate."
+  "Executes HTTP PUT request for `url` and, optionally, more `req` attributes.
+  See [[request]]."
   [url & [req]]
   (request (merge req {:method :put :url url})))
 
 (defn delete
-  "Like #'request, but sets the :method and :url as appropriate."
+  "Executes HTTP DELETE request for `url` and, optionally, more `req` attributes.
+  See [[request]]."
   [url & [req]]
   (request (merge req {:method :delete :url url})))
 

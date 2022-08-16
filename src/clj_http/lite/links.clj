@@ -54,8 +54,10 @@
     response))
 
 (defn wrap-links
-  "Add a :links key to the response map that contains parsed Link headers. The
-  links will be represented as a map, with the 'rel' value being the key. The
+  "Returns request wrapper fn for `client` that adds
+  a `:links` key to the response map that contains parsed link headers.
+
+  The links are returned as a map, with the 'rel' value being the key. The
   URI is placed under the 'href' key, to mimic the HTML link element.
 
   e.g. Link: <http://example.com/page2.html>; rel=next; title=\"Page 2\"
