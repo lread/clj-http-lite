@@ -1,6 +1,6 @@
-(ns clj-http.test.client
+(ns clj-http.test.client-test
   (:require [clj-http.lite.client :as client]
-            [clj-http.test.core :refer [base-req with-server current-port]]
+            [clj-http.test.core-test :refer [base-req with-server current-port]]
             [clj-http.lite.util :as util]
             [clojure.test :refer [deftest is testing use-fixtures]])
   (:import (java.net UnknownHostException)))

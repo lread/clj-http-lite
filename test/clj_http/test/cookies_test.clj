@@ -1,4 +1,4 @@
-(ns clj-http.test.cookies
+(ns clj-http.test.cookies-test
   #_(:use [clj-http.lite.util]
           [clojure.test]))
 
