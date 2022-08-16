@@ -9,29 +9,29 @@
 (set! *warn-on-reflection* true)
 
 (defn utf8-bytes
-  "Returns the UTF-8 bytes corresponding to the given string."
+  "Returns the UTF-8 bytes for string `s`."
   [#^String s]
   (.getBytes s "UTF-8"))
 
 (defn utf8-string
-  "Returns the String corresponding to the UTF-8 decoding of the given bytes."
+  "Returns the string for UTF-8 decoding of bytes `b`."
   [#^"[B" b]
   (String. b "UTF-8"))
 
 (defn url-decode
-  "Returns the form-url-decoded version of the given string, using either a
-  specified encoding or UTF-8 by default."
+  "Returns the form-url-decoded version of `encoded` string, using either a
+  specified `encoding` or UTF-8 by default."
   [^String encoded & [encoding]]
   (let [^String encoding (or encoding "UTF-8")]
     (URLDecoder/decode encoded encoding)))
 
 (defn url-encode
-  "Returns an UTF-8 URL encoded version of the given string."
+  "Returns an UTF-8 URL encoded version of `unencoded` string."
   [^String unencoded]
   (URLEncoder/encode unencoded "UTF-8"))
 
 (defmacro base64-encode
-  "Encode an array of bytes into a base64 encoded string."
+  "Encode an array of `unencoded` bytes into a base64 encoded string."
   [unencoded]
   (if (try (import 'javax.xml.bind.DatatypeConverter)
            (catch Exception _))
@@ -41,7 +41,7 @@
       `(.encodeToString (java.util.Base64/getEncoder) ~unencoded))))
 
 (defn to-byte-array
-  "Returns a byte array for the InputStream provided."
+  "Returns a byte array for InputStream `is`."
   [is]
   (let [chunk-size 8192
         baos (ByteArrayOutputStream.)
@@ -54,7 +54,7 @@
 
 
 (defn gunzip
-  "Returns a gunzip'd version of the given byte array."
+  "Returns a gunzip'd version of byte array `b`."
   [b]
   (when b
     (if (instance? InputStream b)
@@ -62,7 +62,7 @@
       (to-byte-array (GZIPInputStream. (ByteArrayInputStream. b))))))
 
 (defn gzip
-  "Returns a gzip'd version of the given byte array."
+  "Returns a gzip'd version byte array `b`."
   [b]
   (when b
     (let [baos (ByteArrayOutputStream.)
@@ -72,13 +72,13 @@
       (.toByteArray baos))))
 
 (defn inflate
-  "Returns a zlib inflate'd version of the given byte array."
+  "Returns a zlib inflate'd version byte array `b`."
   [b]
   (when b
     (to-byte-array (InflaterInputStream. (ByteArrayInputStream. b)))))
 
 (defn deflate
-  "Returns a deflate'd version of the given byte array."
+  "Returns a deflate'd version byte array `b`."
   [b]
   (when b
     (to-byte-array (DeflaterInputStream. (ByteArrayInputStream. b)))))

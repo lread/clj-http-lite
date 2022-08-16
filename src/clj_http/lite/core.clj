@@ -7,9 +7,9 @@
 (set! *warn-on-reflection* true)
 
 (defn parse-headers
-  "Takes a URLConnection and returns a map of names to values.
+  "Returns a map of names to values for URLConnection `conn`.
 
-   If a name appears more than once (like `set-cookie`) then the value
+   If a header name appears more than once (like `set-cookie`) then the value
    will be a vector containing the values in the order they appeared
    in the headers."
   [conn]
@@ -26,8 +26,8 @@
                     (vec v))))))))
 
 (defn- coerce-body-entity
-  "Coerce the http-entity from an HttpResponse to either a byte-array, or a
-  stream that closes itself and the connection manager when closed."
+  "Return body response from HttpURLConnection `conn` coerced to either a byte-array,
+  or a stream."
   [{:keys [as]} conn]
   (let [ins (try
               (.getInputStream ^HttpURLConnection conn)
@@ -74,11 +74,8 @@
 (def-insecure)
 
 (defn request
-  "Executes the HTTP request corresponding to the given Ring request map and
-   returns the Ring response map corresponding to the resulting HTTP response.
-
-   Note that where Ring uses InputStreams for the request and response bodies,
-   the clj-http uses ByteArrays for the bodies."
+  "Executes the HTTP request corresponding to the given Ring `req` map and
+   returns the Ring response map corresponding to the resulting HTTP response."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body socket-timeout
            conn-timeout insecure? save-request? follow-redirects
