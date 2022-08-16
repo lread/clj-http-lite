@@ -156,12 +156,11 @@
       (is (or (= java.net.SocketTimeoutException (class e))
               (= java.net.SocketTimeoutException (class (.getCause e))))))))
 
-;; HUC can't do this
-;; (deftest ^{:integration true} delete-with-body
-;;   (run-server)
-;;   (let [resp (request {:request-method :delete :uri "/delete-with-body"
-;;                        :body (.getBytes "foo bar")})]
-;;     (is (= 200 (:status resp)))))
+(deftest ^{:integration true} delete-with-body
+  (let [resp (request {:request-method :delete :uri "/delete-with-body"
+                       :body (.getBytes "foo bar")})]
+    (is (= 200 (:status resp)))
+    (is (= "delete-with-body" (slurp-body resp)))))
 
 (deftest ^{:integration true} self-signed-ssl-get
   (let [client-opts {:request-method :get
@@ -190,35 +189,7 @@
                :request
                (dissoc :body))))))
 
-;; (deftest parse-headers
-;;   (are [headers expected]
-;;        (let [iterator (BasicHeaderIterator.
-;;                        (into-array BasicHeader
-;;                                    (map (fn [[name value]]
-;;                                           (BasicHeader. name value))
-;;                                         headers))
-;;                        nil)]
-;;          (is (= (core/parse-headers iterator)
-;;                 expected)))
-
-;;        []
-;;        {}
-
-;;        [["Set-Cookie" "one"]]
-;;        {"set-cookie" "one"}
-
-;;        [["Set-Cookie" "one"]
-;;         ["set-COOKIE" "two"]]
-;;        {"set-cookie" ["one" "two"]}
-
-;;        [["Set-Cookie" "one"]
-;;         ["serVer"     "some-server"]
-;;         ["set-cookie" "two"]]
-;;        {"set-cookie" ["one" "two"]
-;;         "server"     "some-server"}))
-
 (deftest ^{:integration true} t-streaming-response
   (let [stream (:body (request {:request-method :get :uri "/get" :as :stream}))
         body (slurp stream)]
     (is (= "get" body))))
-
