@@ -236,8 +236,12 @@
   "Returns a battaries-included HTTP request function coresponding to the given
    core client. See client/client."
   [request]
+  ;; note to the uninitiated: wrapper behaviour is applied to requests in order listed here but
+  ;; from last to first
   (-> request
       wrap-query-params
+      wrap-basic-auth
+      wrap-oauth
       wrap-user-info
       wrap-url
       wrap-redirects
@@ -245,15 +249,13 @@
       wrap-input-coercion
       wrap-output-coercion
       wrap-exceptions
-      wrap-basic-auth
       wrap-accept
       wrap-accept-encoding
       wrap-content-type
       wrap-form-params
       wrap-method
       wrap-links
-      wrap-unknown-host
-      wrap-oauth))
+      wrap-unknown-host))
 
 (def #^{:doc
         "Executes the HTTP request corresponding to the given map and returns

@@ -1,6 +1,7 @@
 ### Unreleased
 
 - If specified, request's body encoding is now applied, else defaults to UTF-8 ([#18](https://github.com/clj-commons/clj-http-lite/issues/18)) ([@lread](https://github.com/lread))
+- User info from request URL now applied to basic auth ([#34](https://github.com/clj-commons/clj-http-lite/issues/34)) ([@lread](https://github.com/lread))
 - Quality
   - Automated CI testing added for Windows ([#21](https://github.com/clj-commons/clj-http-lite/issues/21)) ([@lread](https://github.com/lread))
 
