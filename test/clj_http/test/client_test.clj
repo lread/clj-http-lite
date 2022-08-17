@@ -299,6 +299,23 @@
       (is (= "untouched" (:body resp)))
       (is (not (contains? resp :content-type))))))
 
+(deftest apply-on-nest-params
+  (let [param-client (client/wrap-nested-params identity)
+        params {:a
+                {:b
+                 {:c 5}
+                 :e
+                 {:f 6}}
+                :g 7}
+        resp (param-client {:form-params params :query-params params})]
+    (is (= {"a[b][c]" 5 "a[e][f]" 6 :g 7} (:form-params resp) (:query-params resp)))))
+
+(deftest pass-on-no-nest-params
+  (let [m-client (client/wrap-nested-params identity)
+        echo (m-client {:key :val})]
+    (is (= :val (:key echo)))
+    (is (not (:request-method echo)))))
+
 (deftest t-ignore-unknown-host
   (is (thrown? UnknownHostException (client/get "http://aorecuf892983a.com")))
   (is (nil? (client/get "http://aorecuf892983a.com"
