@@ -1,6 +1,6 @@
-# `clj-http-lite` [![cljdoc badge](https://cljdoc.xyz/badge/org.clj-commons/clj-http-lite)](https://cljdoc.xyz/d/org.clj-commons/clj-http-lite/CURRENT) [![CI](https://github.com/martinklepsch/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/martinklepsch/clj-http-lite/actions) [![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://babashka.org)
+# `clj-http-lite` [![cljdoc badge](https://cljdoc.org/badge/org.clj-commons/clj-http-lite)](https://cljdoc.org/d/org.clj-commons/clj-http-lite) [![CI tests](https://github.com/clj-commons/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/clj-commons/clj-http-lite/actions) [![Clojars](https://img.shields.io/clojars/v/org.clj-commons/clj-http-lite.svg)](https://clojars.org/org.clj-commons/clj-http-lite) [![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://babashka.org)
 
-A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with GraalVM.
+A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with Babashka and GraalVM.
 
 > This is a clj-commons maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
 
@@ -43,28 +43,32 @@ The main HTTP client functionality is provided by the
 ```
 
 The client supports simple `get`, `head`, `put`, `post`, and `delete`
-requests. Responses are returned as Ring-style response maps:
+requests. They all return Ring-style response maps:
 
 ```clojure
-(client/get "http://google.com")
+(client/get "https://google.com")
 => {:status 200
-    :headers {"date" "Sun, 01 Aug 2010 07:03:49 GMT"
+    :headers {"date" "Wed, 17 Aug 2022 21:37:58 GMT"
               "cache-control" "private, max-age=0"
               "content-type" "text/html; charset=ISO-8859-1"
               ...}
     :body "<!doctype html>..."}
 ```
 
-More example requests:
+**TIP**: We encourage you to try out these examples in your REPL, `httpbin.org` is a free HTTP test playground and used in many examples.
 
 ```clojure
-(client/get "http://site.com/resources/id")
+(client/get "https://httpbin.org/user-agent")
 
-(client/get "http://site.com/resources/3" {:accept :json})
+;; Tell the server you'd like a json response
+(client/get "https://httpbin.org/user-agent" {:accept :json})
 
-;; Various options:
-(client/post "http://site.com/api"
-  {:basic-auth ["user" "pass"]
+;; Or maybe you'd like html back
+(client/get "https://httpbin.org/html" {:accept "text/html"})
+
+;; Various options
+(client/post "https://httpbin.org/anything"
+  {:basic-auth ["joe" "cool"]
    :body "{\"json\": \"input\"}"
    :headers {"X-Api-Version" "2"}
    :content-type :json
@@ -73,35 +77,41 @@ More example requests:
    :accept :json})
 
 ;; Need to contact a server with an untrusted SSL cert?
-(client/get "https://alioth.debian.org" {:insecure? true})
+(client/get "https://expired.badssl.com" {:insecure? true})
 
-;; If you don't want to follow-redirects automatically:
-(client/get "http://site.come/redirects-somewhere" {:follow-redirects false})
+;; By default we automatically follow 30* redirects...
+(client/get "https://httpbin.org/redirect-to?url=https%3A%2F%2Fclojure.org")
+
+;; ... but you don't have to
+(client/get "https://httpbin.org/redirect-to?url=https%3A%2F%2Fclojure.org"
+            {:follow-redirects false})
 
 ;; Send form params as a urlencoded body
-(client/post "http//site.com" {:form-params {:foo "bar"}})
+(client/post "https://httpbin.org/post" {:form-params {:foo "bar"}})
 
 ;; Basic authentication
-(client/get "http://site.com/protected" {:basic-auth ["user" "pass"]})
-(client/get "http://site.com/protected" {:basic-auth "user:pass"})
+(client/get "https://joe:cool@httpbin.org/basic-auth/joe/cool")
+(client/get "https://httpbin.org/basic-auth/joe/cool" {:basic-auth ["joe" "cool"]})
+(client/get "https://httpbin.org/basic-auth/joe/cool" {:basic-auth "joe:cool"})
 
-;; Query parameters
-(client/get "http://site.com/search" {:query-params {"q" "foo, bar"}})
+;; Query parameters can be specified as a map
+(client/get "https://httpbin.org/get" {:query-params {"q" "foo, bar"}})
 ```
 
-The client will also follow redirects on the appropriate `30*` status
-codes.
+The client transparently accepts and decompresses the `gzip` and `deflate` content encodings.
 
-The client transparently accepts and decompresses the `gzip` and
-`deflate` content encodings.
+```Clojure
+(client/get "https://httpbin.org/gzip")
+
+(client/get "https://httpbin.org/deflate")
+```
 
 ### Nested params
 
 Nested parameter `{:a {:b 1}}` in `:form-params` or `:query-params` is automatically flattened to `a[b]=1`.
-We'll use `httpbin.org` to demonstrate:
 
 ```clojure
-(-> (client/get "https://httpbin.org/get" 
+(-> (client/get "https://httpbin.org/get"
                 {:query-params {:one {:two 2 :three 3}}})
     :body
     println)
@@ -130,50 +140,54 @@ We'll use `httpbin.org` to demonstrate:
 }
 ```
 
-### Input coercion
+### Request body coercion
 
 ```clojure
-;; body as a byte-array
-(client/post "http://site.com/resources" {:body my-byte-array})
+;; body as byte-array
+(client/post "https://httbin.org/post" {:body (.getBytes "testing123")})
 
-;; body as a string
-(client/post "http://site.com/resources" {:body "string"})
+;; body from a string
+(client/post "https://httpbin.org/post" {:body "testing456"})
 
-;; :body-encoding is optional and defaults to "UTF-8"
-(client/post "http://site.com/resources"
-             {:body "string" :body-encoding "UTF-8"})
+;; string :body-encoding is optional and defaults to "UTF-8"
+(client/post "https://httpbin.org/post"
+             {:body "mystring" :body-encoding "UTF-8"})
 
-;; body as a file
-(client/post "http://site.com/resources"
-             {:body (clojure.java.io/file "/tmp/foo") :body-encoding
-             "UTF-8"})
+;; body from a file
+(require '[clojure.java.io :as io])
+(spit "clj-http-lite-test.txt" "from a file")
+(client/post "https://httpbin.org/post"
+             {:body (io/file "clj-http-lite-test.txt")
+              :body-encoding "UTF-8"})
 
-;; :length is NOT optional for passing an InputStream in
-(client/post "http://site.com/resources"
-             {:body (clojure.java.io/input-stream "/tmp/foo")
-              :length 1000})
+;; from a stream
+(with-open [is (io/input-stream "clj-http-lite-test.txt")]
+  (client/post "https://httpbin.org/post"
+               {:body (io/input-stream "clj-http-lite-test.txt")})  )
 ```
 
-### Output coercion
+### Output body coercion
 
 ```clojure
-;; The default output is a string body
-(client/get "http://site.com/foo.txt")
+;; The default response body is a string body
+(client/get "https://clojure.org")
 
-;; Coerce as a byte-array
-(client/get "http://site.com/favicon.ico" {:as :byte-array})
+;; Coerce to a byte-array
+(client/get "http://clojure.org" {:as :byte-array})
 
-;; Coerce as something other than UTF-8 string
-(client/get "http://site.com/string.txt" {:as "UTF-16"})
+;; Coerce to a string with using a specific charset, default is UTF-8
+(client/get "http://clojure.org" {:as "US-ASCII"})
 
-;; Try to automatically coerce the output based on the content-type
-;; header (this is currently a BETA feature!)
-(client/get "http://site.com/foo.bar" {:as :auto})
+;; Try to automatically coerce the body based on the content-type
+;; response header charset
+(client/get "https://google.com" {:as :auto})
 
 ;; Return the body as a stream
-(client/get "http://site.com/bigrequest.html" {:as :stream})
 ;; Note that the connection to the server will NOT be closed until the
 ;; stream has been read
+(let [res (client/get "https://clojure.org" {:as :stream})]
+  (with-open [body-stream (:body res)]
+    (slurp body-stream)))
 ```
 
 A more general `request` function is also available, which is useful
@@ -182,34 +196,36 @@ as a primitive for building higher-level interfaces:
 ```clojure
 (defn api-action [method path & [opts]]
   (client/request
-    (merge {:method method :url (str "http://site.com/" path)} opts)))
+    (merge {:method method :url (str "https://some.api/" path)} opts)))
 ```
 
 ### Exceptions
 
-The client will throw exceptions on, well, exceptional status
-codes. clj-http will throw an `ex-info` with the response as `ex-data`.
+The client will throw exceptions on, exceptional HTTP status
+codes. Clj-http-lite throws an `ex-info` with the response as `ex-data`.
 
 ```clojure
-user=> (client/get "http://site.com/broken")
-Execution error (ExceptionInfo) at clj-http.lite.client/wrap-exceptions$fn (client.clj:38).
-clj-http: status 404
-user=> (-> *e ex-data :status)
-404
-user=> (-> *e ex-data keys)
-(:headers :status :body)
+(client/get "https://httpbin.org/404")
+;; => ExceptionInfo clj-http: status 404  clojure.core/ex-info (core.clj:4617)
+
+(-> *e ex-data :status)
+;; => 404
+
+(-> *e ex-data keys)
+;; => (:headers :status :body)
 ```
 
-You can also ignore exceptions and handle them yourself:
+You can suppress HTTP status exceptions and handle them yourself:
 
 ``` clojure
-(client/get "http://site.com/broken" {:throw-exceptions false})
+(client/get "https://httpbin.org/404" {:throw-exceptions false})
 ```
 
 Or ignore an unknown host (methods return 'nil' if this is set to true and the host does not exist:
 
 ``` clojure
 (client/get "http://aoeuntahuf89o.com" {:ignore-unknown-host? true})
+;; => nil
 ```
 
 ### Proxies
@@ -238,8 +254,8 @@ such), check out the
 
 ## Design
 
-The design of `clj-http` is inspired by the
-[Ring](http://github.com/mmcgrana/ring) protocol for Clojure HTTP
+The design of `clj-http` (and therefore `clj-http-lite`) is inspired by the
+[Ring](https://github.com/ring-clojure/ring) protocol for Clojure HTTP
 server applications.
 
 The client in `clj-http.lite.core` makes HTTP requests according to a given
@@ -255,26 +271,32 @@ are sugar over this `clj-http.lite.client/request` function.
 
 To run tests for the JVM:
 
-    $ bb clean
-    $ bb deps
+```shell
+$ bb clean
+$ bb deps
 
-    Run all Clojure tests against minimum supported version of Clojure (1.8)
-    $ clojure -M:test
+Run all Clojure tests against minimum supported version of Clojure (1.8)
+$ clojure -M:test
 
-    Run Clojure against a specific Clojure version, for example 1.11
-    $ clojure -M:1.11:test
+Run Clojure against a specific Clojure version, for example 1.11
+$ clojure -M:1.11:test
+```
 
 ### Babashka Tests
 
 To run a small suite of sanity tests for babashka (found under ./bb]):
 
-    $ bb test:bb
+```shell
+$ bb test:bb
+```
 
 ### Linting
 
 Our CI workflow lints sources with clj-kondo, and you can too!
 
-    $ bb lint
+```shell
+$ bb lint
+```
 
 ### Release
 
