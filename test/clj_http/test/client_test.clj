@@ -312,9 +312,9 @@
 
 (deftest pass-on-no-nest-params
   (let [m-client (client/wrap-nested-params identity)
-        echo (m-client {:key :val})]
-    (is (= :val (:key echo)))
-    (is (not (:request-method echo)))))
+        in {:key :val}
+        out (m-client in)]
+    (is (= out in))))
 
 (deftest t-ignore-unknown-host
   (is (thrown? UnknownHostException (client/get "http://aorecuf892983a.com")))
