@@ -7,7 +7,8 @@
             [clj-http.lite.links :refer [wrap-links]]
             [clj-http.lite.util :as util]
             [clojure.java.io :as io]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.walk :as walk])
   (:import (java.net UnknownHostException)
            (java.nio.charset Charset))
   (:refer-clojure :exclude (get update)))
@@ -212,6 +213,27 @@
                          :body (generate-query-string form-params))))
       (client req))))
 
+(defn- nest-params
+  [req param-key]
+  (if-let [params (req param-key)]
+    (let [nested (walk/prewalk
+                   #(if (and (vector? %) (map? (second %)))
+                      (let [[fk m] %]
+                        (reduce
+                          (fn [m [sk v]]
+                            (assoc m (str (name fk)
+                                          \[ (name sk) \]) v))
+                          {}
+                          m))
+                      %)
+                   params)]
+      (assoc req param-key nested))
+    req))
+
+(defn wrap-nested-params [client]
+  (fn [req]
+    (client (-> req (nest-params :form-params) (nest-params :query-params)))))
+
 (defn wrap-url [client]
   (fn [req]
     (if-let [url (:url req)]
@@ -255,6 +277,7 @@
       wrap-accept-encoding
       wrap-content-type
       wrap-form-params
+      wrap-nested-params
       wrap-method
       wrap-links
       wrap-unknown-host))

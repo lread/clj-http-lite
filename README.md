@@ -18,11 +18,14 @@ A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http)
 
 - Instead of Apache HttpClient, clj-http-lite uses HttpURLConnection
 - No automatic JSON decoding for response bodies
+- No automatic request body encoding beyond charset and url encoding of form params
 - No cookie support
 - No multipart form uploads
 - No persistent connection support
+- Fewer options
 - namespace rename clj-http.* -> clj-http.lite.*
 
+Like its namesake, clj-http-lite is light and simple, but ping us if there is some clj-http feature you'd like to see in clj-http-lite. We can discuss.
 ## History
 
 - Sep 2011 - [dakrone/clj-http](https://github.com/dakrone/clj-http) created (and is still actively maintained)
@@ -91,6 +94,41 @@ codes.
 
 The client transparently accepts and decompresses the `gzip` and
 `deflate` content encodings.
+
+### Nested params
+
+Nested parameter `{:a {:b 1}}` in `:form-params` or `:query-params` is automatically flattened to `a[b]=1`.
+We'll use `httpbin.org` to demonstrate:
+
+```clojure
+(-> (client/get "https://httpbin.org/get" 
+                {:query-params {:one {:two 2 :three 3}}})
+    :body
+    println)
+{
+  "args": {
+    "one[three]": "3",
+    "one[two]": "2"
+  },
+  ...
+}
+
+(-> (client/post "https://httpbin.org/post"
+                 {:form-params {:one {:two 2
+                                      :three {:four {:five 5}}}
+                                :six 6}})
+    :body
+    println)
+{
+  ...
+  "form": {
+    "one[three][four][five]": "5",
+    "one[two]": "2",
+    "six": "6"
+  },
+  ...
+}
+```
 
 ### Input coercion
 
@@ -188,18 +226,11 @@ such), check out the
 
 ## Known Issues
 
-- Nested form params [aren't serialized correctly](https://github.com/hiredman/clj-http-lite/issues/15). There's an easy workaround however:
-
-    ```clojure
-    :form-params {"toplevel" {"nested" some-data}} ; doesn't work
-    :form-params {"toplevel[nested]" some-data}    ; works
-    ```
-
 - If you issue HTTPS connections, [Native Image](https://www.graalvm.org/docs/reference-manual/native-image/) compilation requires an additional parameter in order to enable its support in the generated image.
 
   If you get the following kind of error:
 
-      Exception in thread "main" java.net.MalformedURLException: Accessing an URL protocol that was not enabled.  
+      Exception in thread "main" java.net.MalformedURLException: Accessing an URL protocol that was not enabled.
       The URL protocol https is supported but not enabled by default. It must be enabled by adding the
       -H:EnableURLProtocols=https option to the native-image command.
 
