@@ -3,6 +3,7 @@
   (:require [clojure.java.io :as io])
   (:import (java.io ByteArrayInputStream ByteArrayOutputStream InputStream)
            (java.net URLEncoder URLDecoder)
+           (java.util Base64)
            (java.util.zip InflaterInputStream DeflaterInputStream
                           GZIPInputStream GZIPOutputStream)))
 
@@ -30,15 +31,10 @@
   [^String unencoded]
   (URLEncoder/encode unencoded "UTF-8"))
 
-(defmacro base64-encode
+(defn base64-encode
   "Encode an array of `unencoded` bytes into a base64 encoded string."
   [unencoded]
-  (if (try (import 'javax.xml.bind.DatatypeConverter)
-           (catch Exception _))
-    `(javax.xml.bind.DatatypeConverter/printBase64Binary ~unencoded)
-    (do
-      (import 'java.util.Base64)
-      `(.encodeToString (java.util.Base64/getEncoder) ~unencoded))))
+  (.encodeToString (Base64/getEncoder) unencoded))
 
 (defn to-byte-array
   "Returns a byte array for InputStream `is`."
@@ -51,7 +47,6 @@
         (.write baos buffer 0 len)
         (recur (.read ^InputStream is buffer 0 chunk-size))))
     (.toByteArray baos)))
-
 
 (defn gunzip
   "Returns a gunzip'd version of byte array `b`."
