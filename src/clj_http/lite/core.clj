@@ -41,35 +41,37 @@
         (.flush baos)
         (.toByteArray baos)))))
 
-(def ^:private insecure-mode
-  (delay (throw (ex-info "insecure? option not supported in this environment"
-                         {}))))
+(defn- trust-all-ssl!
+  [_conn]
+  (throw (ex-info "insecure? option not supported in this environment"
+                  {})))
 
 (defmacro ^:private def-insecure []
   (when (try (import '[javax.net.ssl
                        HttpsURLConnection SSLContext TrustManager X509TrustManager HostnameVerifier SSLSession])
              (catch Exception _))
     '(do
-       (defn- my-host-verifier []
-         (proxy [HostnameVerifier] []
-           (verify [^String hostname ^javax.net.ssl.SSLSession session] true)))
-
-       (defn trust-invalid-manager
-         "This allows the ssl socket to connect with invalid/self-signed SSL certs."
-         []
-         (reify javax.net.ssl.X509TrustManager
-           (getAcceptedIssuers [this] nil)
-           (checkClientTrusted [this certs authType])
-           (checkServerTrusted [this certs authType])))
-
-       (def ^:private insecure-mode
+       (def ^:private trust-all-hostname-verifier
          (delay
-           (HttpsURLConnection/setDefaultSSLSocketFactory
-            (.getSocketFactory
-             (doto (SSLContext/getInstance "SSL")
-               (.init nil (into-array TrustManager [(trust-invalid-manager)])
-                      (new java.security.SecureRandom)))))
-           (HttpsURLConnection/setDefaultHostnameVerifier (my-host-verifier)))))))
+          (proxy [HostnameVerifier] []
+            (verify [^String hostname ^SSLSession session] true))))
+
+       (def ^:private trust-all-ssl-socket-factory
+         (delay
+          (.getSocketFactory
+           (doto (SSLContext/getInstance "SSL")
+             (.init nil (into-array TrustManager [(reify X509TrustManager
+                                                    (getAcceptedIssuers [this] nil)
+                                                    (checkClientTrusted [this certs authType])
+                                                    (checkServerTrusted [this certs authType]))])
+                    (new java.security.SecureRandom))))))
+
+       (defn- trust-all-ssl!
+         [conn]
+         (when (instance? HttpsURLConnection conn)
+           (let [^HttpsURLConnection conn conn]
+             (.setHostnameVerifier conn @trust-all-hostname-verifier)
+             (.setSSLSocketFactory conn @trust-all-ssl-socket-factory)))))))
 
 (def-insecure)
 
@@ -84,9 +86,9 @@
                       (when server-port (str ":" server-port))
                       uri
                       (when query-string (str "?" query-string)))
-        _ (when insecure?
-            @insecure-mode)
         ^HttpURLConnection conn (.openConnection (URL. http-url))]
+    (when insecure?
+      (trust-all-ssl! conn))
     (when (and content-type character-encoding)
       (.setRequestProperty conn "Content-Type" (str content-type
                                                     "; charset="
@@ -116,4 +118,4 @@
                     (coerce-body-entity req conn))}
            (when save-request?
              {:request (assoc (dissoc req :save-request?)
-                         :http-url http-url)}))))
+                              :http-url http-url)}))))
