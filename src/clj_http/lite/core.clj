@@ -2,7 +2,8 @@
   "Core HTTP request/response implementation."
   (:require [clojure.java.io :as io])
   (:import (java.io ByteArrayOutputStream InputStream)
-           (java.net URL HttpURLConnection)))
+           (java.net HttpURLConnection URL)
+           (javax.net.ssl HostnameVerifier HttpsURLConnection SSLContext SSLSession TrustManager X509TrustManager)))
 
 (set! *warn-on-reflection* true)
 
@@ -41,39 +42,27 @@
         (.flush baos)
         (.toByteArray baos)))))
 
+(def ^:private trust-all-hostname-verifier
+  (delay
+    (proxy [HostnameVerifier] []
+      (verify [^String hostname ^SSLSession session] true))))
+
+(def ^:private trust-all-ssl-socket-factory
+  (delay
+    (.getSocketFactory
+      (doto (SSLContext/getInstance "SSL")
+        (.init nil (into-array TrustManager [(reify X509TrustManager
+                                               (getAcceptedIssuers [_this] nil)
+                                               (checkClientTrusted [_this _certs _authType])
+                                               (checkServerTrusted [_this _certs _authType]))])
+               (new java.security.SecureRandom))))))
+
 (defn- trust-all-ssl!
-  [_conn]
-  (throw (ex-info "insecure? option not supported in this environment"
-                  {})))
-
-(defmacro ^:private def-insecure []
-  (when (try (import '[javax.net.ssl
-                       HttpsURLConnection SSLContext TrustManager X509TrustManager HostnameVerifier SSLSession])
-             (catch Exception _))
-    '(do
-       (def ^:private trust-all-hostname-verifier
-         (delay
-          (proxy [HostnameVerifier] []
-            (verify [^String hostname ^SSLSession session] true))))
-
-       (def ^:private trust-all-ssl-socket-factory
-         (delay
-          (.getSocketFactory
-           (doto (SSLContext/getInstance "SSL")
-             (.init nil (into-array TrustManager [(reify X509TrustManager
-                                                    (getAcceptedIssuers [this] nil)
-                                                    (checkClientTrusted [this certs authType])
-                                                    (checkServerTrusted [this certs authType]))])
-                    (new java.security.SecureRandom))))))
-
-       (defn- trust-all-ssl!
-         [conn]
-         (when (instance? HttpsURLConnection conn)
-           (let [^HttpsURLConnection ssl-conn conn]
-             (.setHostnameVerifier ssl-conn @trust-all-hostname-verifier)
-             (.setSSLSocketFactory ssl-conn @trust-all-ssl-socket-factory)))))))
-
-(def-insecure)
+  [conn]
+  (when (instance? HttpsURLConnection conn)
+    (let [^HttpsURLConnection ssl-conn conn]
+      (.setHostnameVerifier ssl-conn @trust-all-hostname-verifier)
+      (.setSSLSocketFactory ssl-conn @trust-all-ssl-socket-factory))))
 
 (defn request
   "Executes the HTTP request corresponding to the given Ring `req` map and
