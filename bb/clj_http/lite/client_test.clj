@@ -29,3 +29,10 @@
        (is false "should not reach here")
        (catch Exception e
          (is (:headers (ex-data e))))))
+
+(deftest insecure-test
+  (is (thrown? Exception
+               (client/get "https://expired.badssl.com")))
+  (is (= 200 (:status (client/get "https://expired.badssl.com" {:insecure? true}))))
+  (is (thrown? Exception
+               (client/get "https://expired.badssl.com"))))

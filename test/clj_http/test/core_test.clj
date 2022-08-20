@@ -172,7 +172,10 @@
                  (request client-opts)))
     (let [resp (request (assoc client-opts :insecure? true))]
       (is (= 200 (:status resp)))
-      (is (= "get" (slurp-body resp))))))
+      (is (= "get" (slurp-body resp))))
+    (is (thrown? javax.net.ssl.SSLException
+                 (request client-opts))
+        "subsequent bad cert fetch throws")))
 
 (deftest ^{:integration true} t-save-request-obj
   (let [resp (request {:request-method :post :uri "/post"
