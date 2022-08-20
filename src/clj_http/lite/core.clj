@@ -66,16 +66,12 @@
                                                     (checkServerTrusted [this certs authType]))])
                     (new java.security.SecureRandom))))))
 
-       ;; work-around for potential bug in bb/sci, type hints on lets might not
-       ;; always work as expected so factor out to fn with type hint on arg
-       (defn- trust-all-ssl!! [^HttpsURLConnection conn]
-         (.setHostnameVerifier conn @trust-all-hostname-verifier)
-         (.setSSLSocketFactory conn @trust-all-ssl-socket-factory))
-
        (defn- trust-all-ssl!
          [conn]
          (when (instance? HttpsURLConnection conn)
-           (trust-all-ssl!! conn))))))
+           (let [^HttpsURLConnection ssl-conn conn]
+             (.setHostnameVerifier ssl-conn @trust-all-hostname-verifier)
+             (.setSSLSocketFactory ssl-conn @trust-all-ssl-socket-factory)))))))
 
 (def-insecure)
 
