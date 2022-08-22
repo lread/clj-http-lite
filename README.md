@@ -2,9 +2,9 @@
 
 A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with Babashka and GraalVM.
 
-> This is a clj-commons maintained fork of the original [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
+> This is a clj-commons maintained fork of the archived [`hiredman/clj-http-lite`](https://github.com/hiredman/clj-http-lite) repo.
 
-[Installation](#installation) | [Usage](#usage) | [Known Issues](#known-issues) | [Design](#design) | [Development](#development)
+[Installation](#installation) | [Usage](#usage) | [Design](#design) | [Development](#development)
 
 ## Installation
 
@@ -240,17 +240,11 @@ If you need to fake clj-http responses (for things like testing and
 such), check out the
 [clj-http-fake](https://github.com/myfreeweb/clj-http-fake) library.
 
-## Known Issues
+## GraalVM Native Image Tips
 
-- If you issue HTTPS connections, [Native Image](https://www.graalvm.org/docs/reference-manual/native-image/) compilation requires an additional parameter in order to enable its support in the generated image.
+You'll need to enable url protocols when building your native image.
 
-  If you get the following kind of error:
-
-      Exception in thread "main" java.net.MalformedURLException: Accessing an URL protocol that was not enabled.
-      The URL protocol https is supported but not enabled by default. It must be enabled by adding the
-      -H:EnableURLProtocols=https option to the native-image command.
-
-  Then add either `-H:EnableURLProtocols=https` or `--enable-https` option to your compilation step.
+See [GraalVM docs](https://www.graalvm.org/22.2/reference-manual/native-image/dynamic-features/URLProtocols/).
 
 ## Design
 
