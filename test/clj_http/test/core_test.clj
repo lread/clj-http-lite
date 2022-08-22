@@ -82,8 +82,8 @@
 
 (defn base-req []
   {:scheme      :http
-   :server-name (str "localhost:" (current-port))
-   :port        (current-port)})
+   :server-name "localhost"
+   :server-port (current-port)})
 
 (defn request [req]
   (core/request (merge (base-req) req)))
@@ -166,8 +166,8 @@
   (let [client-opts {:request-method :get
                      :uri "/get"
                      :scheme         :https
-                     :server-name (str "localhost:" (current-https-port))
-                     :port        (current-https-port)}]
+                     :server-name "localhost"
+                     :server-port (current-https-port)}]
     (is (thrown? javax.net.ssl.SSLException
                  (request client-opts)))
     (let [resp (request (assoc client-opts :insecure? true))]
@@ -186,8 +186,8 @@
             :http-url       (str "http://localhost:" (current-port) "/post")
             :request-method :post
             :uri            "/post"
-            :server-name    (str "localhost:" (current-port))
-            :port           (current-port)}
+            :server-name    "localhost"
+            :server-port    (current-port)}
            (-> resp
                :request
                (dissoc :body))))))
