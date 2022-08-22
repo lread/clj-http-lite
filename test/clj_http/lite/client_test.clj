@@ -1,58 +1,8 @@
 (ns clj-http.lite.client-test
   (:require [clj-http.lite.client :as client]
-            [clj-http.lite.core-test :refer [base-req with-server current-port]]
             [clj-http.lite.util :as util]
-            [clojure.test :refer [deftest is testing use-fixtures]])
+            [clojure.test :refer [deftest is testing]])
   (:import (java.net UnknownHostException)))
-
-(use-fixtures :each with-server)
-
-(deftest ^{:integration true} roundtrip
-  ;; roundtrip with scheme as a keyword
-  (let [resp (client/request (merge (base-req) {:uri "/get" :method :get}))]
-    (is (= 200 (:status resp)))
-    (is (= "get" (:body resp))))
-  ;; roundtrip with scheme as a string
-  (let [resp (client/request (merge (base-req) {:uri    "/get"
-                                                :method :get
-                                                :scheme "http"}))]
-    (is (= 200 (:status resp)))
-    (is (= "get" (:body resp)))))
-
-(deftest ^{:integration true} basic-auth-no-creds
-  (let [resp (client/request (merge (base-req) {:method :get
-                                                :uri "/basic-auth"
-                                                :throw-exceptions false}))]
-    (is (= 401 (:status resp)))
-    (is (= "denied" (:body resp)))))
-
-(deftest ^{:integration true} basic-auth-bad-creds
-  (let [resp (client/request (merge (base-req) {:method :get
-                                                :uri "/basic-auth"
-                                                :throw-exceptions false
-                                                :basic-auth "username:nope"}))]
-    (is (= 401 (:status resp)))
-    (is (= "denied" (:body resp)))))
-
-(deftest ^{:integration true} basic-auth-creds-as-basic-auth
-  (let [resp (client/request (merge (base-req) {:method :get
-                                                :uri "/basic-auth"
-                                                :basic-auth "username:password"}))]
-    (is (= 200 (:status resp)))
-    (is (= "welcome" (:body resp)))))
-
-(deftest ^{:integration true} basic-auth-creds-as-user-info
-  (let [resp (client/request (merge (base-req) {:method :get
-                                                :uri "/basic-auth"
-                                                :user-info "username:password"}))]
-    (is (= 200 (:status resp)))
-    (is (= "welcome" (:body resp)))))
-
-(deftest ^{:integration true} basic-auth-creds-from-url
-  (let [resp (client/request {:method :get
-                              :url (format "http://username:password@localhost:%d/basic-auth" (current-port))})]
-    (is (= 200 (:status resp)))
-    (is (= "welcome" (:body resp)))))
 
 (defn is-passed [middleware req]
   (let [client (middleware identity)]
