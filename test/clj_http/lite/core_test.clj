@@ -1,4 +1,4 @@
-(ns clj-http.test.core-test
+(ns clj-http.lite.core-test
   (:require [clj-http.lite.core :as core]
             [clj-http.lite.util :as util]
             [clojure.test :refer [deftest is use-fixtures]]
