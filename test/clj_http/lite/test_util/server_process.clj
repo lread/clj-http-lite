@@ -25,7 +25,7 @@
 (defn launch []
   (when (.exists server-state-file)
     (.delete server-state-file))
-  (let [max-wait-msecs 10000 ;; maybe CI is real slow?
+  (let [max-wait-msecs 60000 ;; Windows GitHub Actions CI can be painfully slow
         status-every-ms 1000
         time-limit (+ (System/currentTimeMillis) max-wait-msecs)
         ;; use bb's clojure launcher for an easy time on Windows
