@@ -43,7 +43,7 @@ jobs:
       - name: Lint
         run: bb lint
 
-  test:
+  test-jvm:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
@@ -78,14 +78,11 @@ jobs:
         uses: DeLaGuardo/setup-clojure@9.4
         with:
           bb: 'latest'
-          cli: 'latest'
 
       - name: Tools versions
         run: |
           echo "bb --version"
           bb --version
-          echo "clojure --version"
-          clojure --version
           echo "java -version"
           java -version
 
@@ -93,9 +90,9 @@ jobs:
         run: bb deps
 
       - name: Run tests
-        run: clojure -M:${{ matrix.clojure-version }}:test
+        run: bb test:jvm --clj-version ${{ matrix.clojure-version }}
 
-  bb-test:
+  test-bb:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
@@ -143,8 +140,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - lint
-      - test
-      - bb-test
+      - test-jvm
+      - test-bb
 
     steps:
       - name: Checkout
