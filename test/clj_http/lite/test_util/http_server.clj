@@ -32,7 +32,7 @@
     {:status 500 :body "o noes"}
     [:get "/timeout"]
     (do
-      (Thread/sleep 10)
+      (Thread/sleep 100)
       {:status 200 :body "timeout"})
     [:delete "/delete-with-body"]
     {:status 200 :body "delete-with-body"}
