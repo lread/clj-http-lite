@@ -1,6 +1,7 @@
 (ns clj-http.lite.client-test
   (:require [clj-http.lite.client :as client]
             [clj-http.lite.util :as util]
+            [clj-http.lite.test-util.test-report]
             [clojure.test :refer [deftest is testing]])
   (:import (java.net UnknownHostException)))
 
@@ -132,8 +133,8 @@
     (is (= "fooⓕⓞⓞ" (:body resp)))))
 
 (deftest apply-on-other-output-coercion
-  (let [client (fn [_req] {:body (.getBytes "sõme ßÒññÝ chÀråcters" "windows-1252")
-                          :headers {"content-type" "text/foo;charset=windows-1252"}})
+  (let [client (fn [_req] {:body (.getBytes "sõme ßÒññÝ chÀråcters" "ISO-8859-1")
+                          :headers {"content-type" "text/foo;charset=ISO-8859-1"}})
         o-client (client/wrap-output-coercion client)
         resp (o-client {:uri "/foo" :as :auto})]
     (is (= "sõme ßÒññÝ chÀråcters" (:body resp)))))
@@ -153,7 +154,7 @@
     (doseq [[in-body encoding expected-encoding] [["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" nil            "UTF-8"]
                                                   ["μτƒ8 нαs мαηλ ςнαяαςτεяs ൠ" "UTF-8"        "UTF-8"]
                                                   ["plain text"                "ASCII"        "ASCII"]
-                                                  ["sõme ßÒññÝ chÀråcters"     "windows-1252" "windows-1252"]]]
+                                                  ["sõme ßÒññÝ chÀråcters"     "iso-8859-1"   "iso-8859-1"]]]
       (let [resp (i-client {:body in-body :body-encoding encoding})
             decoded-body (slurp (:body resp) :encoding expected-encoding)]
         (is (= expected-encoding (:character-encoding resp)) "character encoding")

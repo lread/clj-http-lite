@@ -1,6 +1,7 @@
-(ns clj-http.lite.client-test
-  (:require [cheshire.core :as json]
-            [clj-http.lite.client :as client]
+(ns clj-http.lite.client-sanity-test
+  "A small subset of tests suitable for sanity testing.
+  Used by babashka libs tests."
+  (:require [clj-http.lite.client :as client]
             [clojure.test :as t :refer [deftest is]]))
 
 (deftest client-test
@@ -11,14 +12,14 @@
   (is (= 200 (:status (client/post "https://postman-echo.com/post" {:throw-exceptions false}))))
 
   (is (= 200 (:status (client/post "https://postman-echo.com/post"
-                                   {:body (json/generate-string {:a 1})
+                                   {:body "{\"a\": 1}"
                                     :headers {"X-Hasura-Role" "admin"}
                                     :content-type :json
                                     :accept :json
                                     :throw-exceptions false}))))
 
   (is (= 200  (:status (client/put "https://postman-echo.com/put"
-                                   {:body (json/generate-string {:a 1})
+                                   {:body "{\"a\": 1}"
                                     :headers {"X-Hasura-Role" "admin"}
                                     :content-type :json
                                     :accept :json

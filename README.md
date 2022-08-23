@@ -315,25 +315,38 @@ are sugar over this `clj-http.lite.client/request` function.
 
 ### Clojure JVM Tests
 
-To run tests for the JVM:
-
+Optionally:
 ```shell
 $ bb clean
 $ bb deps
+```
 
-Run all Clojure tests against minimum supported version of Clojure (1.8)
-$ clojure -M:test
+Run all Clojure tests against minimum supported version of Clojure (1.8):
 
-Run Clojure against a specific Clojure version, for example 1.11
-$ clojure -M:1.11:test
+```shell
+$ bb test:jvm
+```
+
+Run tests against a specific Clojure version, for example 1.11
+```shell
+$ bb test:jvm --clj-version 1.11
+```
+
+You can also include cognitect test runner options:
+```shell
+$ bb test:jvm --clj-version 1.9 --namespace-regex '*.sanity.*'
 ```
 
 ### Babashka Tests
 
-To run a small suite of sanity tests for babashka (found under ./bb]):
+To run the entire test suite under Babashka:
 
 ```shell
 $ bb test:bb
+```
+You can also include cognitect test runner options:
+```shell
+$ bb test:bb --var clj-http.lite.integration-test/roundtrip
 ```
 
 ### Linting

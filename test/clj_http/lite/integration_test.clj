@@ -2,89 +2,26 @@
   (:require [clj-http.lite.client :as client]
             [clj-http.lite.core :as core]
             [clj-http.lite.util :as util]
-            [clojure.test :refer [deftest is use-fixtures]]
-            [clojure.string :as str]
-            [ring.adapter.jetty :as ring])
-  (:import (org.eclipse.jetty.server Server ServerConnector)
-           (java.util Base64)))
-
-(set! *warn-on-reflection* true)
-
-(defn b64-decode [^String s]
-  (when s
-    (-> (Base64/getDecoder)
-        (.decode s)
-        util/utf8-string)))
-
-(defn handler [req]
-  (condp = [(:request-method req) (:uri req)]
-    [:get "/get"]
-    {:status 200 :body "get"}
-    [:head "/head"]
-    {:status 200}
-    [:get "/content-type"]
-    {:status 200 :body (:content-type req)}
-    [:get "/header"]
-    {:status 200 :body (get-in req [:headers "x-my-header"])}
-    [:post "/post"]
-    {:status 200 :body (slurp (:body req))}
-    [:get "/redirect"] {:status 302 :headers {"Location" "/get"}}
-    [:get "/error"]
-    {:status 500 :body "o noes"}
-    [:get "/timeout"]
-    (do
-      (Thread/sleep 10)
-      {:status 200 :body "timeout"})
-    [:delete "/delete-with-body"]
-    {:status 200 :body "delete-with-body"}
-    ;; minimal to support testing
-    [:get "/basic-auth"]
-    (let [cred (some->> (get (:headers req) "authorization")
-                        (re-find #"^Basic (.*)$")
-                        last
-                        b64-decode)
-      [user pass] (and cred (str/split cred #":"))]
-      (if (and (= "username" user) (= "password" pass))
-        {:status 200 :body "welcome"}
-        {:status 401 :body "denied"}))))
-
-(defn make-server ^Server []
-  (ring/run-jetty handler {:port         0 ;; Use a free port
-                           :join?        false
-                           :ssl-port     0 ;; Use a free port
-                           :ssl?         true
-                           :keystore     "test-resources/keystore"
-                           :key-password "keykey"}))
+            [clj-http.lite.test-util.server-process :as server-process]
+            [clj-http.lite.test-util.test-report]
+            [clojure.test :refer [deftest is use-fixtures]]))
 
 (def ^:dynamic *server* nil)
 
-(defn- port-for-protocol [p]
-  (let [^Server s *server*]
-    (some (fn [^ServerConnector c]
-            (when (str/starts-with? (str/lower-case (.getDefaultProtocol c)) p)
-              (.getLocalPort c)))
-          (.getConnectors s))))
-
-(defn current-port []
-  (port-for-protocol "http/"))
-
-(defn current-https-port []
-  (port-for-protocol "ssl"))
-
 (defn with-server [t]
-  (let [s (make-server)]
+  (let [s (server-process/launch)]
     (try
       (binding [*server* s]
         (t))
       (finally
-        (-> s .stop)))))
+        (server-process/kill s)))))
 
-(use-fixtures :each with-server)
+(use-fixtures :once with-server)
 
 (defn base-req []
   {:scheme      :http
    :server-name "localhost"
-   :server-port (current-port)})
+   :server-port (:http-port *server*)})
 
 (defn request [req]
   (core/request (merge (base-req) req)))
@@ -155,10 +92,11 @@
 (deftest sets-socket-timeout
   (try
     (request {:request-method :get :uri "/timeout" :socket-timeout 1})
-    (throw (Exception. "Shouldn't get here."))
-    (catch Exception e
-      (is (or (= java.net.SocketTimeoutException (class e))
-              (= java.net.SocketTimeoutException (class (.getCause e))))))))
+    (is false "expected a throw")
+    (catch Exception ^Exception e
+      (is (or (= "Read timed out" (.getMessage e))
+              (let [^Exception cause (.getCause e)]
+                (= "Read timed out" (.getMessage cause))))))))
 
 (deftest delete-with-body
   (let [resp (request {:request-method :delete :uri "/delete-with-body"
@@ -171,15 +109,20 @@
                      :uri "/get"
                      :scheme         :https
                      :server-name "localhost"
-                     :server-port (current-https-port)}]
-    (is (thrown? javax.net.ssl.SSLException
-                 (request client-opts)))
+                     :server-port (:https-port *server*)}]
+    (try
+      (request client-opts)
+      (is false "expected a throw")
+      (catch Exception ^Exception e
+        (is (re-find #"SunCertPathBuilderException" (.getMessage e)))))
     (let [resp (request (assoc client-opts :insecure? true))]
       (is (= 200 (:status resp)))
       (is (= "get" (slurp-body resp))))
-    (is (thrown? javax.net.ssl.SSLException
-                 (request client-opts))
-        "subsequent bad cert fetch throws")))
+    (try
+      (request client-opts)
+      (is false "expected a throw")
+      (catch Exception ^Exception e
+        (is (re-find #"SunCertPathBuilderException" (.getMessage e)))))))
 
 (deftest t-save-request-obj
   (let [resp (request {:request-method :post :uri "/post"
@@ -187,11 +130,11 @@
                        :save-request?  true})]
     (is (= 200 (:status resp)))
     (is (= {:scheme         :http
-            :http-url       (str "http://localhost:" (current-port) "/post")
+            :http-url       (str "http://localhost:" (:http-port *server*) "/post")
             :request-method :post
             :uri            "/post"
             :server-name    "localhost"
-            :server-port    (current-port)}
+            :server-port    (:http-port *server*)}
            (-> resp
                :request
                (dissoc :body))))))
@@ -247,6 +190,7 @@
 
 (deftest basic-auth-creds-from-url
   (let [resp (client/request {:method :get
-                              :url (format "http://username:password@localhost:%d/basic-auth" (current-port))})]
+                              :url (format "http://username:password@localhost:%d/basic-auth"
+                                           (:http-port *server*))})]
     (is (= 200 (:status resp)))
     (is (= "welcome" (:body resp)))))
