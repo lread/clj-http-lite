@@ -4,9 +4,12 @@
 - User info from request URL now applied to basic auth ([#34](https://github.com/clj-commons/clj-http-lite/issues/34)) ([@lread](https://github.com/lread))
 - Nested query and form parameters are now automatically flattened ([#43](https://github.com/clj-commons/clj-http-lite/issues/43)) ([@lread](https://github.com/lread))
 - The `:insecure?` option is now applied only to the current request ([#45](https://github.com/clj-commons/clj-http-lite/issues/45)) ([@lread](https://github.com/lread))
+- Docs
+  - Docstrings and README reviewed and updated ([@lread](https://github.com/lread))
+  - Guidance on mocking HTTP requests now makes sense ([#51](https://github.com/clj-commons/clj-http-lite/issues/51)) (thanks [@anderseknert](https://github.com/anderseknert)!)
 - Quality
-  - Docstrings and README reviewed and updated
   - Automated CI testing added for Windows ([#21](https://github.com/clj-commons/clj-http-lite/issues/21)) ([@lread](https://github.com/lread))
+  - Babashka now exercised under full test suite ([#48](https://github.com/clj-commons/clj-http-lite/issues/48)) ([@lread](https://github.com/lread))
 
 ### 0.4.384
 
