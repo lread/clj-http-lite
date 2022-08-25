@@ -1,4 +1,5 @@
-# `clj-http-lite` [![cljdoc badge](https://cljdoc.org/badge/org.clj-commons/clj-http-lite)](https://cljdoc.org/d/org.clj-commons/clj-http-lite) [![CI tests](https://github.com/clj-commons/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/clj-commons/clj-http-lite/actions) [![Clojars](https://img.shields.io/clojars/v/org.clj-commons/clj-http-lite.svg)](https://clojars.org/org.clj-commons/clj-http-lite) [![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://babashka.org)
+# `clj-http-lite`
+[![cljdoc badge](https://cljdoc.org/badge/org.clj-commons/clj-http-lite)](https://cljdoc.org/d/org.clj-commons/clj-http-lite) [![CI tests](https://github.com/clj-commons/clj-http-lite/workflows/Tests/badge.svg)](https://github.com/clj-commons/clj-http-lite/actions) [![Clojars](https://img.shields.io/clojars/v/org.clj-commons/clj-http-lite.svg)](https://clojars.org/org.clj-commons/clj-http-lite) [![bb compatible](https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg)](https://babashka.org) [![Join chat](https://img.shields.io/badge/slack-join_chat-brightgreen.svg)](https://clojurians.slack.com/archives/C03UZ1Y8414)
 
 A Clojure HTTP library similar to [clj-http](http://github.com/dakrone/clj-http), but more lightweight. Compatible with Babashka and GraalVM.
 
