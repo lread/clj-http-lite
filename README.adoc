@@ -23,11 +23,18 @@ toc::[]
 
 == Installation
 
-`clj-http-lite` is available as a Maven artifact from https://clojars.org/org.clj-commons/clj-http-lite[Clojars]:
+Clojure cli users, add the following under `:deps` in your `deps.edn` file. +
+Babashka users, add the following under `:deps` in your `bb.edn` file:
+[source,clojure,subs="attributes+"]
+----
+    org.clj-commons/clj-http-lite {:mnv/version "{lib-version}"}
+----
+
+Lein users, add the following into the `:dependencies` vector in your `project.clj` file:
 
 [source,clojure,subs="attributes+"]
 ----
-[org.clj-commons/clj-http-lite "{lib-version}"]
+    [org.clj-commons/clj-http-lite "{lib-version}"]
 ----
 
 == Differences from clj-http
@@ -39,7 +46,7 @@ toc::[]
 * No multipart form uploads
 * No persistent connection support
 * Fewer options
-* namespace rename clj-http.* -> clj-http.lite.*
+* namespace rename `clj-http.*` -> `clj-http.lite.*`
 
 Like its namesake, clj-http-lite is light and simple, but ping us if there is some clj-http feature you’d like to see in clj-http-lite.
 We can discuss.
@@ -54,7 +61,7 @@ We can discuss.
 == Usage
 
 === General
-The main HTTP client functionality is provided by the `clj-http.lite.client` namespace:
+HTTP client functionality is provided by the `clj-http.lite.client` namespace:
 
 [source,clojure]
 ----
@@ -75,7 +82,7 @@ They all return Ring-style response maps:
     :body "<!doctype html>..."}
 ----
 
-TIP: We encourage you to try out these examples in your REPL, `httpbin.org` is a free HTTP test playground and used in many examples.
+TIP: We encourage you to try out these examples in your REPL, `httpbin.org` is a free HTTP test playground and used in many of our examples.
 
 [source,clojure]
 ----
@@ -226,7 +233,8 @@ A more general `request` function is also available, which is useful as a primit
 
 === Exceptions
 
-The client will throw exceptions on, exceptional HTTP status codes. Clj-http-lite throws an `ex-info` with the response as `ex-data`.
+When a server returns an exceptional HTTP status code, by default, clj-http-lite throws an `ex-info` exception.
+The response is included as `ex-data`.
 
 [source,clojure]
 ----
@@ -240,14 +248,15 @@ The client will throw exceptions on, exceptional HTTP status codes. Clj-http-lit
 ;; => (:headers :status :body)
 ----
 
-You can suppress HTTP status exceptions and handle them yourself:
+You can suppress HTTP status exceptions and handle them yourself via the `:throw-exceptions` option:
 
 [source,clojure]
 ----
 (client/get "https://httpbin.org/404" {:throw-exceptions false})
 ----
 
-Or ignore an unknown host (methods return `nil' if this is set to true and the host does not exist:
+You can choose to ignore an unknown host via `:ingore-unknown-host?` option.
+When enabled, requests return `nil` if the host is not found.
 
 [source,clojure]
 ----
@@ -393,7 +402,7 @@ $ bb lint
 
 === Release
 
-To release a new version, run `bb publish` which will push a new tag. 
+To release a new version, run `bb publish` which will push a new tag.
 CI will take care of the rest.
 
 == License
