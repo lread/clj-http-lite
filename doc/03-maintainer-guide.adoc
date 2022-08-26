@@ -1,0 +1,19 @@
+= Maintainer Guide
+
+== Introduction
+
+Notes for project maintainers.
+
+== Releasing
+
+The following is *NOT* currently automated:
+
+* reviewing and updating changelog "unreleased" section
+* generating a GitHub release
+
+To release a new version, run `bb publish` which will push a new tag.
+CI will:
+
+* run lint and tests
+* create a thin jar
+* publish the jar to clojars
