@@ -2,7 +2,8 @@
  :deps {lread/status-line {:git/url "https://github.com/lread/status-line.git"
                            :sha "35ed39645038e81b42cb15ed6753b8462e60a06d"}}
  :tasks
- {:requires ([tasks :as t])
+ {:requires ([lread.status-line :as status]
+             [tasks :as t])
   deps
   {:doc "Bring down all the clojure deps"
    :task (t/deps)}
@@ -26,4 +27,13 @@
    :task lint/-main}
   publish
   {:doc "Trigger a release to clojars"
-   :task (t/publish)}}}
+   :task (do (status/line :head "Instructions to publish")
+             (status/line :detail "A maintainer with sufficient privileges will be able to:\n")
+             (status/line :detail "1. In a browser open:")
+             (status/line :detail "   https://github.com/clj-commons/clj-http-lite/actions/workflows/release.yml")
+             (status/line :detail "2. Initiate release via \"Run workflow\"")
+             (status/line :detail "\nFor more details see:")
+             (status/line :detail "https://github.com/clj-commons/clj-http-lite/blob/master/doc/03-maintainer-guide.adoc"))}
+  ci-release
+  {:doc "CI release workflow support, use --help for args"
+   :task ci-release/-main}}}

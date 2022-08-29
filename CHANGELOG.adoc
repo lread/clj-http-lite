@@ -1,5 +1,13 @@
 = Changelog
 
+A release with an intentional breaking changes is marked with:
+
+* [breaking] you probably need to change your code
+* [minor breaking] you likely don't need to change your code
+
+// DO NOT UPDATE "Unreleased" HEADING MANUALLY
+// The CI release workflow will automatically validate section,
+// then update the "Unreleased" text to release version
 == Unreleased
 
 * If specified, request’s body encoding is now applied, else defaults to UTF-8 (https://github.com/clj-commons/clj-http-lite/issues/18[#18]) (https://github.com/lread[@lread])
@@ -14,7 +22,9 @@
 ** Automated CI testing added for Windows (https://github.com/clj-commons/clj-http-lite/issues/21[#21]) (https://github.com/lread[@lread])
 ** Babashka now exercised under full test suite (https://github.com/clj-commons/clj-http-lite/issues/48[#48]) (https://github.com/lread[@lread])
 
-== 0.4.384
+https://github.com/clj-commons/etaoin/compare/Release-0.4.392\...Release-1.0.13[Full commit log]
+
+== v0.4.384
 
 * Support self-signed certificates via `:insecure? true` option
 * Remove dependency on slingshot
@@ -22,14 +32,14 @@
 * Add compatibility with https://babashka.org/[babashka]
 * *Feature:* Support for`:oauth-token` (https://github.com/martinklepsch/clj-http-lite/pull/7[#1])
 
-== 0.4.3
+== v0.4.3
 
 * *Feature:* Parse link headers from response and put them under `:links` (https://github.com/martinklepsch/clj-http-lite/pull/1[#1])
 
-== 0.4.2
+== v0.4.2
 
 * Add type hints for GraalVM (https://github.com/clj-commons/clj-http-lite/pull/2[#2])
 
-== 0.4.0
+== v0.4.0
 
 * *Feature:* Java 9/10 Compatibility

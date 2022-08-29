@@ -1,8 +1,6 @@
 (ns tasks
   (:require [babashka.tasks :refer [shell clojure]]
-            [build-shared :as shared]
-            [clojure.edn :as edn]
-            [clojure.string :as str]))
+            [clojure.edn :as edn]))
 
 (defn deps []
   (let [aliases (->> "deps.edn"
@@ -17,22 +15,3 @@
       (println "Bring down deps for alias" a)
       (clojure "-P" (str "-M" a)))))
 
-(defn replace-version [file version cc]
-  (spit file
-        (str/replace (slurp file)
-                     (re-pattern (format "(%s)\\.(\\d+)" version))
-                     (fn [[_ version _]]
-                       (str version "." cc)))))
-
-(defn publish []
-  (let [;; commit count + 1 for README update
-        cc (inc (shared/git-count-revs))
-        tag (str "Release-" (shared/version cc))]
-    ;; TODO: Update
-    (replace-version "README.md" shared/base-version cc)
-    (replace-version "project.clj" shared/base-version cc)
-    (shell "git add README.md project.clj")
-    (shell "git commit -m 'Bump version in README'")
-    (shell "git push")
-    (shell "git tag" tag)
-    (shell "git push origin" tag)))
