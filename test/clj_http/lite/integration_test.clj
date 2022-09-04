@@ -93,10 +93,9 @@
   (try
     (request {:request-method :get :uri "/timeout" :socket-timeout 1})
     (is false "expected a throw")
-    (catch Exception ^Exception e
-      (is (or (= "Read timed out" (.getMessage e))
-              (let [^Exception cause (.getCause e)]
-                (= "Read timed out" (.getMessage cause))))))))
+    (catch Exception e
+      (is (or (= java.net.SocketTimeoutException (class e))
+              (= java.net.SocketTimeoutException (class (.getCause e))))))))
 
 (deftest delete-with-body
   (let [resp (request {:request-method :delete :uri "/delete-with-body"
@@ -110,19 +109,13 @@
                      :scheme         :https
                      :server-name "localhost"
                      :server-port (:https-port *server*)}]
-    (try
-      (request client-opts)
-      (is false "expected a throw")
-      (catch Exception ^Exception e
-        (is (re-find #"SunCertPathBuilderException" (.getMessage e)))))
+    (is (thrown? javax.net.ssl.SSLException
+                 (request client-opts)))
     (let [resp (request (assoc client-opts :insecure? true))]
       (is (= 200 (:status resp)))
       (is (= "get" (slurp-body resp))))
-    (try
-      (request client-opts)
-      (is false "expected a throw")
-      (catch Exception ^Exception e
-        (is (re-find #"SunCertPathBuilderException" (.getMessage e)))))))
+    (is (thrown? javax.net.ssl.SSLException
+                 (request client-opts)))))
 
 (deftest t-save-request-obj
   (let [resp (request {:request-method :post :uri "/post"
