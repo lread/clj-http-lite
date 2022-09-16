@@ -50,6 +50,7 @@ A big thank you to al the people who have contributed directly to clj-http-lite!
 * https://github.com/vemv[@vemv]
 * https://github.com/deas[@deas]
 * https://github.com/anderseknert[@anderseknert]
+* https://github.com/mokshasoft[@mokshasoft]
 
 Don't see your name? Our apologies! Let us know and we'll add you in.
 
