@@ -7,7 +7,6 @@ lib
 syntax: glob
 creds.clj
 Manifest.txt
-pom.xml
 aws.clj
 *.ser
 *.class
