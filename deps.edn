@@ -1,12 +1,17 @@
 {:paths ["src"]
  :deps {org.clojure/clojure {:mvn/version "1.8.0"}}
  :aliases
- {:1.8 {:override-deps {org.clojure/clojure {:mvn/version "1.8.0"}}}
+ {;; we use babashka/neil for project attributes
+  ;; publish workflow references these values (and automatically bumps patch)
+  :neil {:project {:version "1.0.12"
+                   :name org.clj-commons/clj-http-lite}}
+  :1.8 {:override-deps {org.clojure/clojure {:mvn/version "1.8.0"}}}
   :1.9 {:override-deps {org.clojure/clojure {:mvn/version "1.9.0"}}}
   :1.10 {:override-deps {org.clojure/clojure {:mvn/version "1.10.3"}}}
   :1.11 {:override-deps {org.clojure/clojure {:mvn/version "1.11.1"}}}
   :build
-  {:deps {io.github.clojure/tools.build {:git/tag "v0.8.3" :git/sha "0d20256"}
+  {:extra-paths ["build"]
+   :deps {io.github.clojure/tools.build {:git/tag "v0.8.3" :git/sha "0d20256"}
           slipset/deps-deploy {:mvn/version "0.2.0"}}
    :ns-default build}
   :http-server ;; used for to support integration tests
