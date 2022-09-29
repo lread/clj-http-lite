@@ -16,7 +16,7 @@ Clj-http-lite is a Clojure, Babashka and GraalVM compatible liteweight subset of
 * No multipart form uploads
 * No persistent connection support
 * Fewer options
-* namespace rename `clj-http.*` -> `clj-http.lite.*`
+* namespace rename `+clj-http.*+` -> `+clj-http.lite.*+`
 
 Like its namesake, clj-http-lite is light and simple, but ping us if there is some clj-http feature you’d like to see in clj-http-lite.
 We can discuss.
