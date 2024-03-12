@@ -67,7 +67,8 @@
                                            :ssl-port     0 ;; Use a free port
                                            :ssl?         true
                                            :keystore     "test-resources/keystore"
-                                           :key-password "keykey"})]
+                                           :key-password "keykey"
+                                           :sni-host-check? false})]
     (println "server started")
     (fs/create-dirs "target")
     (let [ports {:http-port (port-for-protocol s "http/")
