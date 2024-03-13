@@ -23,7 +23,7 @@ We can discuss.
 
 === Supported Environments [[supported-envs]]
 
-* JDK 8, 11, 17
+* JDK 8, 11, 17, 21
 * Clojure 1.8 runtime and above
 * Babashka current release
 * Windows, Linux, macOS

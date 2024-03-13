@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/workflows/shared-setup
@@ -29,14 +29,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [{name: 'windows', shell: 'pwsh'}, {name: 'ubuntu', shell: 'bash'}]
-        clojure-version: ["1.8", "1.9", "1.10", "1.11"]
-        jdk: ['8', '11', '17']
+        clojure-version: ["1.8", "1.9", "1.10", "1.11", "1.12"]
+        jdk: ['8', '11', '17', '21']
 
-    name: ${{ matrix.os.name }} clj-${{ matrix.clojure-version }} jdk${{ matrix.java-version }}
+    name: ${{ matrix.os.name }} clj-${{ matrix.clojure-version }} jdk${{ matrix.jdk }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/workflows/shared-setup
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/workflows/shared-setup
