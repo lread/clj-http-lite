@@ -37,7 +37,7 @@ Don't see your project listed? Let us know, we'll be happy to include it!
 
 === Contributors
 
-A big thank you to al the people who have contributed directly to clj-http-lite!
+A big thank you to all the people who have contributed directly to clj-http-lite!
 
 * https://github.com/katox[@katox]
 * https://github.com/sattvik[@sattvik]
@@ -66,6 +66,6 @@ Don't see your name? Our apologies! Let us know and we'll add you in.
 * https://github.com/borkdude[@borkdude]
 
 == License
-We respect the original license at time of forking from clj-http:
+We respect the original license at the time of forking from clj-http:
 
 Released under the MIT License: http://www.opensource.org/licenses/mit-license.php
