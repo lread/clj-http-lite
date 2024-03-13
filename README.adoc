@@ -5,7 +5,7 @@
 
 // Badges
 link:{url-doc}[image:https://cljdoc.org/badge/{project-mvn-coords}[Cljdoc]] 
-https://github.com/{project-src-coords}/actions/workflows/ci.yml[image:https://github.com/{project-src-coords}/workflows/Tests/badge.svg[GitHub Actions tests]]
+https://github.com/{project-src-coords}/actions/workflows/tests.yml[image:https://github.com/{project-src-coords}/workflows/tests/badge.svg[GitHub Actions tests]]
 https://clojars.org/{project-mvn-coords}[image:https://img.shields.io/clojars/v/{project-mvn-coords}.svg[Clojars]]
 https://babashka.org[image:https://raw.githubusercontent.com/babashka/babashka/master/logo/badge.svg[bb compatible]]
 https://clojurians.slack.com/archives/C03UZ1Y8414[image:https://img.shields.io/badge/slack-join_chat-brightgreen.svg[Join chat]]
