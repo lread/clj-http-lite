@@ -34,6 +34,9 @@
          lint
          {:doc "[--rebuild] Lint source code"
           :task lint/-main}
+         outdated
+         {:doc "Report on outdated dependencies"
+          :task (clojure {:continue true} "-M:outdated")}
          pubcheck
          {:doc "run only publish checks (without publishing)"
           :task publish/pubcheck}
@@ -42,7 +45,7 @@
           :task publish/-main}
          neil ;; let's not rely on a random version of neil
          {:doc "Pinned version of babashka/neil (used in scripting)"
-          :extra-deps {io.github.babashka/neil {:git/tag "v0.2.63" :git/sha "076fb83"}}
+          :extra-deps {io.github.babashka/neil {:git/tag "v0.3.65" :git/sha "9a79582"}}
           :task babashka.neil/-main}
          ;; hidden tasks, no need for folks to be trying these ci invoked tasks
          -ci-clojars-deploy
